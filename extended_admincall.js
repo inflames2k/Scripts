@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      2.0
+// @version      1.9
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
+// @downlodUrl   https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/extended_admincall.js
 // @require https://code.jquery.com/jquery-3.3.1.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @change       20240806 - Added report processing quota
