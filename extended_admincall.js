@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      1.9
+// @version      2.0
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
