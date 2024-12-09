@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      2.1
+// @version      2.2
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -96,8 +96,8 @@
 
       commonWarnTexts.push({
         title: 'Transphobe Äußerung',
-        text: 'Hallo ' + $reportedUser + ',da du durch transphoben Äußerungen aufgefallen bist wirst du verwarnt.Knuddels ist ein Ort der Toleranz und Respekt.Bitte halte dich an die AGB.'
-	comment: 'BS fällt hier durch transphobe Aussagen auf. Daher heir verwarnt.#1. Verstoß',
+        text: 'Hallo ' + $reportedUser + ',da du durch transphoben Äußerungen aufgefallen bist wirst du verwarnt.Knuddels ist ein Ort der Toleranz und Respekt.Bitte halte dich an die AGB.',
+        comment: 'BS fällt hier durch transphobe Aussagen auf. Daher heir verwarnt.#1. Verstoß',
       })
 
       profileContentWarnTexts.push({
