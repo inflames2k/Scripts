@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      2.2
+// @version      2.3
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -42,6 +42,21 @@
      setReportQuota();
 
      createWarningTexts();
+
+    function showChangeLog()
+    {
+        $('.reportContent').html('');
+
+       $('.reportContent').append("<div class='changelog'></div>");
+
+       $('.changelog').load('https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/changelog.html' + ' #content', function() {
+       });
+
+       $('.modal-content').css('height', '400px');
+       $('.reportcontent').css('height', '370px');
+
+       $('.modal').show();
+    }
 
     function createWarningTexts()
     {
@@ -707,7 +722,9 @@
         $('#main div:contains("Du bist eingeloggt")').addClass('loginDetail');
 
         if(!$( ".logoutLink" ).length)
-            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><select id="styleSelect" name="style"><option value="Light">Light</option><option value="Dark">Dark</option></select>');
+            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><a href="#" id="changelog">Changelog</a><br><br><select id="styleSelect" name="style"><option value="Light">Light</option><option value="Dark">Dark</option></select>');
+
+        $('#changelog').click(function(){ showChangeLog(); return false; });
 
         currentStyle = localStorage.getItem("reportStyle") ?? "Light";
 
@@ -1246,6 +1263,10 @@
               color: #000;
               text-decoration: none;
               cursor: pointer;
+            }
+
+            #changelog {
+               font-size: 10px;
             }
 
         `;
