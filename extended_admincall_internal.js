@@ -9,8 +9,6 @@
 
      var currentStyle = "Light";
 
-     bootStrap();
-
      function enableRequestReportLink()
      {
          enableReportRequestLink = true;
