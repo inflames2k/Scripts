@@ -4,9 +4,15 @@
      const commonWarnTexts = [];
      const profilePictureWarnTexts = [];
      const profileContentWarnTexts = [];
-     const requestReportLinkUser = "Jiacky";
+
+     var enableRequestReportLink = false;
 
      var currentStyle = "Light";
+
+     function enableRequestReportLink()
+     {
+         enableRequestReportLink = true;
+     }
 
      function bootStrap()
      {
@@ -155,7 +161,7 @@
             $("a:contains('Hilfe')").remove();
             $("#navi a:contains('Logout')").remove();
 
-            if(requestReportLinkUser == $('div:contains("Du bist eingeloggt als:")').last().children().first().html())
+            if(enableRequestReportLink)
                 $('#navi').html('<a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | ' + $('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
             else
                 $('#navi').html($('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
