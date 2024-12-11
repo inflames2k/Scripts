@@ -14,8 +14,9 @@
 (function() {
     'use strict';
 
-    // Aktivierung des Links 'Meldung beantragen' im Navigationsmenü
-    //enableRequestReportLink();
+    var enableReportRequestLink = false;
+
+
 
     // function for generation of userdefined warn texts
     function generateWarnTexts()
@@ -45,14 +46,11 @@
      const profilePictureWarnTexts = [];
      const profileContentWarnTexts = [];
 
-     var enableReportRequestLink = false;
+
 
      var currentStyle = "Light";
 
-     function enableRequestReportLink()
-     {
-         enableReportRequestLink = true;
-     }
+
 
      function bootStrap()
      {
