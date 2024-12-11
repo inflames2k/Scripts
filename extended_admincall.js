@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      2.3
+// @version      2.4
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -207,6 +207,9 @@
 
             $('div.content-type-section:first > p', $logDiv).each(function (){
                   if($(this).hasClass('hilite')) {
+
+                      //$('.hilite').html($('.hilite').html().replace( $reportedUser, '<a href="#" class="aiLinkBSF">' +  $reportedUser + '</a>'));
+                      //console.log('created link');
                       return;
                   }
                   else if($('b:first', $(this)).text().includes(reportingUser)) {
@@ -1078,7 +1081,7 @@
               position: absolute;
               top: 10px;
               right: 20px;
-             // max-width: 250px;
+              max-width: 350px;
             }
 
             .content-type-section
