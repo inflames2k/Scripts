@@ -5,7 +5,7 @@
      const profilePictureWarnTexts = [];
      const profileContentWarnTexts = [];
 
-     var enableRequestReportLink = false;
+     var enableReportRequestLink = false;
 
      var currentStyle = "Light";
 
@@ -161,7 +161,7 @@
             $("a:contains('Hilfe')").remove();
             $("#navi a:contains('Logout')").remove();
 
-            if(enableRequestReportLink)
+            if(enableReportRequestLink)
                 $('#navi').html('<a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | ' + $('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
             else
                 $('#navi').html($('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
