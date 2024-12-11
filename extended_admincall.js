@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended admincall
 // @namespace    http://ps.addins.net/
-// @version      2.5
+// @version      2.6
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -13,6 +13,9 @@
 
 (function() {
     'use strict';
+
+    // Aktivierung des Links 'Meldung beantragen' im Navigationsmenü
+    //enableRequestReportLink();
 
     // function for generation of userdefined warn texts
     function generateWarnTexts()
