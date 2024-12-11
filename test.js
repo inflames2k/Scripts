@@ -8,7 +8,7 @@
 
      var currentStyle = "Light";
 
-     function bootStrap()
+     export function bootStrap()
      {
      	autoRefresh();
      	addOverlay();
