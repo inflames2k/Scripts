@@ -11,7 +11,7 @@
 
      function enableRequestReportLink()
      {
-         enableRequestReportLink = true;
+         enableReportRequestLink = true;
      }
 
      function bootStrap()
