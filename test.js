@@ -8,16 +8,19 @@
 
      var currentStyle = "Light";
 
-     autoRefresh();
-     addOverlay();
-     modifyLayout();
+     function bootStrap()
+     {
+     	autoRefresh();
+     	addOverlay();
+     	modifyLayout();
 
-     modifyNavigation();
-     modifyLog();
-     filterActions();
-     setReportQuota();
+     	modifyNavigation();
+     	modifyLog();
+     	filterActions();
+     	setReportQuota();
 
-     createWarningTexts();
+     	createWarningTexts();
+     }
 
     function showChangeLog()
     {
