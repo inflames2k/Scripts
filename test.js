@@ -1,5 +1,3 @@
-     require('./mymodule');
-
      const reportID = $('h1:contains("Knuddels.de - Meldesystem")').text().replace('Knuddels.de - Meldesystem - Meldung ', '').split(' ')[0];
      const $reportedUser = $($("h3 div span").filter(function () { return $(this).css('color') === 'rgb(153, 0, 0)'; }).get(0)).text();
 
