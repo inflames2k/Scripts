@@ -588,7 +588,7 @@
 
       for(var i = 0; i < warnings.length; i++)
       {
-        $('.reportContent').append("<details><summary>" + warnings[i].title + "</summary><textarea style='width: 100%; height: 50px;'>" + warnings[i].text + "</textarea><input class='modern-button copyWarn' id='"+ warnings[i].title + "' name='" + type + "' style='width: 100%' type='button' value='Kopieren' /></details><br>");
+        $('.reportContent').append("<details><summary>" + warnings[i].title + "</summary><textarea style='width: 100%; height: 50px;'>" + warnings[i].text.replace('{reportedUser}', $reportedUser)  + "</textarea><input class='modern-button copyWarn' id='"+ warnings[i].title + "' name='" + type + "' style='width: 100%' type='button' value='Kopieren' /></details><br>");
       }
 
       $('.modal-content').css('height', '400px');
