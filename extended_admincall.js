@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.8
+// @version      2.8.1
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1466,12 +1466,13 @@ class BaseVariables
 			  gap: .4em !important;
 			}
 
+
 			.content-type-section p {
 			   padding: 0;
 			   margin: 0;
-               width: 980;
-               padding-left: 2px;
-               padding-right: 5px;
+         width: 98%;
+         padding-left: 2px;
+         padding-right: 5px;
 			}
 
 			.configContent .reportContent .content-type-section p {
