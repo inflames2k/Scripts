@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.2
+// @version      2.7.3
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -555,6 +555,10 @@ class BaseVariables
 
             $(".hilite").css("background-color", "#F3E2A9");
             $(".bsf").css("background-color", "#CEF6CE");
+
+            $(this).css("max-height", 'none');
+
+            $('a:contains("Bereich voll anzeigen")').text("Bereich eingrenzen");
         });
 
         $("h3:contains('Gemeldete Inhalte')").each(function(i){
@@ -1156,6 +1160,8 @@ class BaseVariables
 
       setReportLinks();
       addTextFilter();
+
+
     }
 
     function showReportLink()
@@ -1190,6 +1196,8 @@ class BaseVariables
         });
 
         showInputs();
+
+
       }
     }
 
