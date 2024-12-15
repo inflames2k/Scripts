@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.5
+// @version      2.7.6
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -144,7 +144,7 @@ class BaseVariables
 					<div class="config-content">
 						<div class="configContent" style="max-width: 800px;">⚙️
               <center><h2>Einstellungen verwalten</h2></center>
-              <ul id="tabs">
+              <ul id="tabs" style="max-width: 800px">
                 <li>
                   <input type="radio" id="tab-1" name="tabControl" checked />
                   <label for="tab-1">Allgemein</label>
@@ -1160,14 +1160,19 @@ class BaseVariables
 
       setReportLinks();
       addTextFilter();
+      addReportNames();
 
+    }
 
-
-      if (window.location.href.includes("ac_overview.pl") || window.location.href.includes("ac_search.pl")) {
+    function addReportNames()
+    {
+       if (window.location.href.includes("ac_overview.pl") || window.location.href.includes("ac_search.pl")) {
         const headerRow = $('table tr').first();
         if (headerRow.length && !headerRow.find('th:contains("Accountnamen")').length) {
-            headerRow.append('<th class="Q">Accountnamen</th>');
+            headerRow.append('<th class="Q">Accountnamen<br>Channel</th>');
         }
+        else
+          return;
 
         $('table tbody tr').each(function(index) {
             const row = $(this);
@@ -1185,13 +1190,16 @@ class BaseVariables
 
                         let meldender = '';
                         let gemeldeter = '';
+                        let channel = '';
 
                         const meldenderAlt = doc.querySelector('h3 div[style*="float:left"] span[style*="color: #060"]');
                         const gemeldeterAlt = doc.querySelector('h3 div[style*="float:left"] span[style*="color: #900"]');
+                        const channelAlt = doc.querySelector('span[title="Channel"]');
 
                         if (meldenderAlt && gemeldeterAlt) {
                             meldender = meldenderAlt.textContent.trim();
                             gemeldeter = gemeldeterAlt.textContent.trim();
+                            channel = channelAlt.textContent.trim();
                         }
 
                         if (!meldender || !gemeldeter) {
@@ -1207,10 +1215,11 @@ class BaseVariables
                             }
                         }
 
+
                         const backgroundColor = (index % 2 === 0) ? '#DDDDDD' : '#EEEEEE';
 
                         if (!row.find('td.nicknamen-column').length) {
-                            row.append('<td class="Q"><span style="color: #060; font-weight: bold;">' + (meldender || 'Unbekannt') + '</span><br><span style="color: #900; font-weight: bold;">' + (gemeldeter || 'Unbekannt') + '</span></td>');
+                            row.append('<td class="Q"><span style="color: #060; font-weight: bold;">' + (meldender || 'Unbekannt') + '</span><br><span style="color: #900; font-weight: bold;">' + (gemeldeter || 'Unbekannt') + '</span><br><b>Channel: </b>' +  channel + '</td>');
                         }
                     }
                 });
