@@ -1,78 +1,131 @@
 // ==UserScript==
-// @name         Extended admincall
+// @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.6
+// @version      2.7
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @require https://code.jquery.com/jquery-3.3.1.min.js
+// @require https://code.jquery.com/ui/1.12.1/jquery-ui.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/extended_admincall.js
 // ==/UserScript==
 
+class WarnText
+{
+  constructor(title, text, comment)
+  {
+    this.title = title;
+    this.text = text;
+    this.comment = comment;
+    this.id = WarnText.uuidv4();
+  }
+
+  static uuidv4() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+       (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+    );
+  }
+}
+
+class WarnTextCollection
+{
+  constructor(commonWarns, profileContentWarns, profilePictureWarns)
+  {
+    this.commonWarns = commonWarns;
+    this.profileContentWarns = profileContentWarns;
+    this.profilePictureWarns = profilePictureWarns;
+  }
+
+  save()
+  {
+     localStorage.setItem('warnTexts', JSON.stringify(this));
+  }
+
+  static load()
+  {
+    var result = JSON.parse(localStorage.getItem('warnTexts'));
+
+    return new WarnTextCollection(result.commonWarns, result.profileContentWarns, result.profilePictureWarns);
+  }
+}
+
+class Settings
+{
+   constructor()
+   {
+   }
+
+   load()
+   {
+     this.enableReportRequestlink = localStorage.getItem("newReportLink") ?? "aus";
+     this.currentStyle = localStorage.getItem("reportStyle") ?? "Light";
+     this.overViewRefreshInterval = localStorage.getItem("refreshInterval") ?? 5000;
+     this.warnTextCollection = WarnTextCollection.load();
+   }
+
+   save()
+   {
+     localStorage.setItem("newReportLink", this.enableReportRequestlink);
+     localStorage.setItem("reportStyle", this.currentStyle);
+     localStorage.setItem("refreshInterval", this.overViewRefreshInterval);
+     this.warnTextCollection.save();
+   }
+}
+
+class BaseVariables
+{
+  constructor()
+  {
+    this.settings = new Settings();
+    this.settings.load();
+
+    this.reportID = $('h1:contains("Knuddels.de - Meldesystem")').text().replace('Knuddels.de - Meldesystem - Meldung ', '').split(' ')[0];
+    this.reportedUser = $($("h3 div span").filter(function () { return $(this).css('color') === 'rgb(153, 0, 0)'; }).get(0)).text();
+    this.changeLogUri = 'https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/changelog.html';
+    this.reportType = $("h3:contains('Typ:')").children().last().text().replace($("h3:contains('Typ:')").children().last().children().first().text(), '');
+
+  }
+}
+
+
 (function() {
     'use strict';
 
-    var enableReportRequestLink = false;
-
-
-
-    // function for generation of userdefined warn texts
-    function generateWarnTexts()
-    {
-      // Beispiel für das manuelle Hinzufügen eines Verwarntexts
-      //
-      // commonWarnTexts.push({
-      //  title: 'Bezeichnung des Verstoßes (z.B. Beleidigungen)',
-      //  text: 'Text der als Verwarntext versendet wird',
-      //  comment: 'Kommentar für automatisches Einfügen in das Abschlusskommentar Feld'
-      //});
-      //
-      // Zur Verfügung stehen folgende Verwarntext-Collections:
-      // commonWarnTexts = Allgemeine Verwarnungen (Aussage melden, AE, etc)
-      // profileContentWarnTexts = Verwarntexte für Profilverstöße (Readme, Profilinhalte)
-      // profilePictureWarnTexts = Verwarntexte für Profilbildverstöße
-      //
-      // Soll im Verwarntext der Nutzername mit ausgegeben werden, muss im Text folgende Wildcard eingebaut werden:
-      // {user}
-      // dadurch wird ein einmaliges vorkommen von {user} durch den Namen des gemeldeten ersetzt
-    }
-
-    const reportID = $('h1:contains("Knuddels.de - Meldesystem")').text().replace('Knuddels.de - Meldesystem - Meldung ', '').split(' ')[0];
-     const $reportedUser = $($("h3 div span").filter(function () { return $(this).css('color') === 'rgb(153, 0, 0)'; }).get(0)).text();
-
-     const commonWarnTexts = [];
-     const profilePictureWarnTexts = [];
-     const profileContentWarnTexts = [];
-
-
-
-     var currentStyle = "Light";
-
-
+     var baseVariables = new BaseVariables();
 
      function bootStrap()
      {
-     	autoRefresh();
-     	addOverlay();
-     	modifyLayout();
+        $('meta[http-equiv="Content-type]"').remove();
+        $('head').append('<meta charset="Unicode" />');
+        autoRefresh();
+        addOverlay();
+        addConfigshow();
+        modifyNavigation();
+        modifyLayout();
+        $('#footer').html($('#footer').html() + " - " + GM_info.script.name + " " + GM_info.script.version);
 
-     	modifyNavigation();
-     	modifyLog();
-     	filterActions();
-     	setReportQuota();
+        $('#styleSelect').val(baseVariables.settings.currentStyle);
+        setCurrentStyle();
 
-     	createWarningTexts();
+        $('#reportLinkSelect').val(baseVariables.settings.enableReportRequestlink);
+        showReportLink();
+
+        $('#refreshInterval').val(baseVariables.settings.overViewRefreshInterval / 1000);
+
+        modifyLog();
+        filterActions();
+        setReportQuota();
      }
 
     function showChangeLog()
     {
-        $('.reportContent').html('');
+       $('.reportContent').html('');
 
-       $('.reportContent').append("<div class='changelog'></div>");
+       $('.reportContent').append("📋 <div class='changelog'></div>");
 
-       $('.changelog').load('https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/changelog.html' + ' #content', function() {
+       $('.changelog').load(baseVariables.changeLogUri + ' #content', function() {
        });
 
        $('.modal-content').css('height', '400px');
@@ -81,70 +134,348 @@
        $('.modal').show();
     }
 
-    function createWarningTexts()
+    function addConfigshow()
     {
-      // create common warningTexts
-      commonWarnTexts.push({
-        title: 'Provokationen / Beleidigungen',
-        text: 'Hallo '+ $reportedUser +',#du fielst durch Beleidigungen und / oder Provokationen gegenüber anderen Mitgliedern auf. Derartiges Verhalten entspricht nicht dem Knigge und den AGB von Knuddels.#Man sollte Menschen mit Respekt und Toleranz begegnen.#Bitte halte dich in Zukunft an die AGB und den Knigge.',
-        comment: 'BS fällt hier durch Beleidigungen / Provokationen auf. Daher hier verwarnt.'
-      });
+       $('#content').parent().parent().html($('#content').parent().parent().html() + `
+        <div class="config">
+					<div class="config-content">
+						<div class="configContent">⚙️
+              <center><h2>Einstellungen verwalten</h2></center>
+              <ul id="tabs">
+                <li>
+                  <input type="radio" id="tab-1" name="tabControl" checked />
+                  <label for="tab-1">Allgemein</label>
+                  <section>
+                    <div class="memberWrapper" id="commonSettings">
+                      <h3>⚙️ Allgemeine Einstellungen</h3>
+                      <table style="width: 100%">
+                      <tr></tr>
+                      <tr>
+                        <td style="width: 0px"></td>
+                        <td>🕔 Aktualisierung Übersicht:</td>
+                        <td><input type="number" step="1" id="refreshInterval" required style="width: 100px"><br><br><span style="font-size: 12px; padding-top: 5px">Legt das Aktualisierungsinterval (s) für die Übersicht fest (Min: 5 Sekunden, Max: 360 Sekunden).</span></td>
+                      </tr>
+                      <tr>
+                        <td style="width: 0px"></td>
+                        <td style="width: 200px">🔆 Darstellungsmodus:</td>
+                        <td><select id="styleSelect" name="style" style="width: 100px"><option value="Light">Light</option><option value="Dark">Dark</option></select><br><br><span style="font-size: 12px; padding-top: 10px">Schaltet den Anzeigemodus zwischen Light und Dark um.</span><br><br></td>
+                      </tr>
+                      <tr>
+                        <td style="width: 0px"></td>
+                        <td>🔗 Link "Meldung beantragen":</td>
+                        <td><select id="reportLinkSelect" name="reportLink" style="width: 100px"><option value="an">An</option><option value="aus">Aus</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert den Link "Meldung beantragen" im Menü des Meldesystems.</span></td>
+                      </tr>
+                      </table>
+                    </div>
+                  </section>
+                </li>
+                <li>
+                  <input type="radio" id="tab-2" name="tabControl" />
+                  <label for="tab-2">Verwarntexte</label>
+                  <section>
+                    <div class="memberWrapper" id="warningSettings" style="margin-top: 10px;">
+                       <h3>⚠️ Verwarntexte</h3>
 
-      commonWarnTexts.push({
-        title: 'Fremdseitenwerbung',
-        text: 'Hallo '+ $reportedUser +',#du fielst durch Werbung für externe Seiten auf. Entsprechend AGB Punkt 6 ist derartige Werbung nicht gestattet.#Bitte halte dich zukünftig an die AGB.',
-        comment: 'BS fällt hier durch Werbung für eine externe Website auf. Daher hier verwarnt.'
-      });
+                      <table style="width: 100%">
+                        <tr></tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td style="width: 200px">⬆️ Importieren</td>
+                          <td><input type="File" id="warnImport"/><br><br></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>⬇️ Exportieren</td>
+                          <td><input type="Button" value="Ausführen" style="width: 114px;" id="warnExport"><br><br></td>
+                        </tr>
+                        <tr>
+                      </table>
 
-      commonWarnTexts.push({
-        title: 'Sexuelle Belästigung Erwachsener',
-        text: 'Hallo '+ $reportedUser +',#du fielst durch Belästigung anderer Mitglieder in Form sexueller Anfragen bzw. Aussagen auf. Derartiges Verhalten entspricht nicht dem Knigge und den AGB.#Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.',
-        comment: 'BS fällt hier durch eindeutige sexuelle Belästigung Erwachsener auf. Daher hier verwarnt.'
-      });
+                      <center><b>Verwarntexte - Allgemein</b></center><br>
+                      <table id="commonWarnDiv" style="width: 100%">
+                        <tr>
+                          <th style="width: 0px; display: none;"/>
+                          <th>Verstoß</th>
+                          <th>Verwarntext</th>
+                          <th>Kommentar</th>
+                          <th></th>
+                          <th><a href="#" id="addCommonWarn">➕</a></th>
+                        </tr>
+                      </table><br>
 
-      commonWarnTexts.push({
-        title: 'Messengerwerbung',
-        text: 'Hallo '+ $reportedUser +',#du fielst durch Werbung für externe Messenger oder andere Kommunikationsplattformen auf. Entsprechend AGB Punkt 5.6 ist derartige Werbung nicht gestattet.#Bitte unterlasse derartiges Verhalten zukünftig und halte dich an die AGB.',
-        comment: 'BS fällt hier durch Werbung für einen Fremdmessenger bzw. eine andere Kommunikationsplattform auf. Daher hier verwarnt.'
-      });
+                      <center><b>Verwarntexte - Profilinhalt</b></center><br>
+                      <table id="profileContentWarnDiv" style="width: 100%">
+                          <th style="width: 0px; display: none;"/>
+                          <th>Verstoß</th>
+                          <th>Verwarntext</th>
+                          <th>Kommentar</th>
+                          <th></th>
+                          <th><a href="#" id="addProfileContentWarn">➕</a></th>
+                      </table><br>
 
-      commonWarnTexts.push({
-        title: 'dubiose öffentliche sexuelle Anfragen',
-        text: 'Hallo ' + $reportedUser + ',du fielst durch (dubiose) öffentliche sexuelle Anfragen außerhalb von Erotic-Channels auf. In den allermeisten Channels sind derartige Anfragen nicht erwünscht und entsprechen demnach auch nicht den AGB.##Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.',
-        comment: 'BS fällt hier durch (dubiose) öffentliche sexuelle Anfragen auf. Daher hier verwarnt.'
-      })
+                      <center><b>Verwarntexte - Profilbilder</b></center><br>
+                      <table id="profilePictureWarnDiv" style="width: 100%">
+                          <th style="width: 0px; display: none;"/>
+                          <th>Verstoß</th>
+                          <th>Verwarntext</th>
+                          <th>Kommentar</th>
+                          <th></th>
+                          <th><a href="#" id="addProfilePictureWarn">➕</a></th>
+                      </table><br>
+                    </div>
+                  </section>
+                </li>
+              </ul>
+            </div><br><br>
+						<div align="right"><a class="close" href="javascript:void(0)">Schließen</a></div>
+					</div>
+				</div>`);
 
-      commonWarnTexts.push({
-        title: 'Rollenspielanfragen (sexuell)',
-        text: 'Hallo ' + $reportedUser + ',du fielst durch öffentliche Rollenspielanfragen mit sexuellem Hintergrund außerhalb von Erotic-Channels auf. In den allermeisten Channels sind derartige Anfragen nicht erwünscht und entsprechen demnach auch nicht den AGB.##Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.',
-        comment: 'BS fällt hier durch öffentliche Rollenspielanfragen mit sexuellem Hintergrund auf. Daher verwarnt.'
-      })
+        $('#addCommonWarn').on("click", function() {
+           var warning = new WarnText("Neuer Verwarntext", "", "");
+           baseVariables.settings.warnTextCollection.commonWarns.splice(0, 0, warning);
+           // need a way to bind editable
+           bindCommonWarns();
+           setEditable(warning);
+        });
 
-      commonWarnTexts.push({
-        title: 'Fremdsprachennutzung',
-        text: 'Hallo ' + $reportedUser + ',du fielst durch öffentliche Nutzung von Fremdsprachen auf. Gemäß den AGB sind jedoch nur Deutsch und Englisch als Chatsprachen erlaubt.#Bitte nutze in Zukunft eine dieser beiden Sprachen.',
-        comment: 'BS fällt hier durch Nutzung einer Fremdsprache auf. Daher hier verwarnt.'
-      })
+        $('#addProfileContentWarn').on("click", function() {
+           var warning = new WarnText("Neuer Verwarntext", "", "");
+           baseVariables.settings.warnTextCollection.profileContentWarns.splice(0, 0, warning);
+           // need a way to bind editable
+           bindProfileContentWarns();
+           setEditable(warning);
+        });
 
-      profileContentWarnTexts.push({
-        title: 'Messengerwerbung (Readme)',
-        text: 'Hallo ' + $reportedUser + ',#ich habe soeben deine Readme entfernt.#Der öffentliche Verweis auf andere Kommunikations- und Messenger Plattformen, die nicht Teil der Knuddels-Dienste sind, ist nicht gestattet. [AGB Punkt 5.6].#Bitte achte künftig darauf, wenn du wieder eine Readme setzen solltest.#Im Rahmen dessen kann die erneute Nennung anderer Kommunikations- und Messenger Plattformen in der Readme künftig zu Nicksperren führen.#Für Rückfragen stehe ich dir gerne zur Verfügung.##Knuddelige Grüße',
-        comment: 'BS fällt hier durch Werbung für Fremdmessenger im Readme auf. 1. Verstoß daher hier verwarnt.'
-      })
+        $('#addProfilePictureWarn').on("click", function() {
+           var warning = new WarnText("Neuer Verwarntext", "", "");
+           baseVariables.settings.warnTextCollection.profilePictureWarns.splice(0, 0, warning);
+           // need a way to bind editable
+           bindProfilePictureWarns();
+           setEditable(warning);
+        });
 
-      profileContentWarnTexts.push({
-        title: 'Messengerwerbung (Profil)',
-        text: 'Hallo ' + $reportedUser + ',#ich habe soeben deine Profil-Tabs gesperrt.#Der öffentliche Verweis auf andere Kommunikations- und Messenger Plattformen, die nicht Teil der Knuddels-Dienste sind, ist nicht gestattet. [AGB Punkt 5.6].#Bitte entferne die entsprechenden Inhalte in deinem Profil und achte künftig darauf, wenn du wieder Profilinhalte setzen solltest.#Im Rahmen dessen kann die erneute Nennung anderer Kommunikations- und Messenger Plattformen im Profil künftig zu Nicksperren führen.#Nach Entfernung der entsprechenden Inhalte aus deinem Profil, kannst du dich zur Freigabe an mich wenden.#Für Rückfragen stehe ich dir gerne zur Verfügung.##Knuddelige Grüße',
-        comment: 'BS fällt durch Messengerwerbung im Profil auf. Profiltabs gesperrt und verwarnt.',
-      })
+        $('#styleSelect').change(function() {
+            baseVariables.settings.currentStyle = $(this).val();
+            setCurrentStyle();
+        });
 
-      profilePictureWarnTexts.push({
-        title: 'Schlechte Qualität / Nicht erkennbar / Nickbesitzer nicht abgebildet',
-        text: 'Hinweisnachricht des Profil-Teams§Hallo,##du hast leider erneut ein Foto hochgeladen, welches mit unseren °>/h Fotoregeln<° nicht übereinstimmt. Diese Nachricht dient als ausdrücklicher Hinweis. Bitte halte dich künftig an die Fotoregeln und lade nur Bilder hoch, auf denen du gut zu erkennen bzw. selbst abgebildet bist.##Solltest du Probleme damit haben, einschätzen zu können, welches Bild unseren Fotoregeln entspricht, kannst du dich auch gerne jederzeit an ein Mitglied des Profil-Teams wenden. Solltest du einen direkten Ansprechpartner des Teams suchen, kannst du im Chat _/team Profil_ eingeben. Dort findest du Teammitglieder, welche aktuell online sind.##Für Rückfragen stehe ich dir gerne zur Verfügung.#Ich bitte dich, meine Hinweisnachricht entsprechend zu beherzigen, denn das Profilfoto sollte ja schließlich dazu dienen zu erkennen, mit wem man eigentlich spricht.#Liebe Grüße',
-        comment: '[Bildbeschreibung]\r\n\r\nAls nicht [erkennbar/selbst] verschoben.\r\n3. Verstoß => VW + AI Eintrag'
-      })
+        $('#reportLinkSelect').change(function() {
+           baseVariables.settings.enableReportRequestlink = $(this).val();
+           baseVariables.settings.save();
+
+           showReportLink();
+        });
+
+        $('#refreshInterval').change(function() {
+          var value = $(this).val();
+
+          if(value < 5)
+          {
+            value = 5;
+            $('#refreshInterval').val(value);
+          }
+          else if(value > 360)
+          {
+            value = 360;
+            $('#refreshInterval').val(value);
+          }
+
+          baseVariables.settings.overViewRefreshInterval = value * 1000;
+          baseVariables.settings.save();
+        });
+
+       // export of warning texts
+       $('#warnExport').on("click", function() {
+         const link = document.createElement("a");
+         const content = JSON.stringify(baseVariables.settings.warnTextCollection, null, 4);
+         const file = new Blob([content], { type: 'text/plain' });
+         link.href = URL.createObjectURL(file);
+         link.download = "warnTexts_" + new Date().toISOString().replaceAll('-', '').replace('T', '_').replace('Z', '') + ".json";
+         //link.download = link.download.replaceAll()
+         link.click();
+         URL.revokeObjectURL(link.href);
+       });
+
+       $('.tablinks').on("click", function() {
+          openSettings($(this), $(this).id);
+       });
+
+       // Import of warning texts
+       $('#warnImport').on("change", function() {
+          var imp = document.getElementById("warnImport");
+
+          if (imp.files.length == 1)
+          {
+            var uri = URL.createObjectURL(imp.files[0]);
+
+            fetch(uri)
+            .then(res => res.json())
+            .then(out => {
+              baseVariables.settings.warnTextCollection = new WarnTextCollection(out.commonWarns, out.profileContentWarns, out.profilePictureWarns);
+              baseVariables.settings.warnTextCollection.save();
+
+              bindWarns();
+
+              alert("Verwarntexte wurden erfolgreich importiert.");
+            })
+            .catch(err => console.log(err));
+          }
+       })
+
+       window.onclick = function(event) {
+            if (event.target.className == "config" || event.target.className == 'modal') {
+                $('.modal').hide();
+            }
+        }
+
+        $('.close').on("click", function() {
+			    closeModal();
+        });
     }
 
+    // set a given warning editable
+    function setEditable(warning)
+    {
+      var index = 0;
+      $('#' + warning.id).siblings().each(function() {
+
+        var text = $(this).text();
+        if(index >= 0 && index < 3){
+          $(this).empty().append('<textarea style="width: 100%; height: 100px;">' + text + '</textarea>');}
+        else if(index == 3)
+          $(this).empty().append('<a href="#" class="confirmEdit' + warning.id + '">✔️</a>');
+        index++;
+      });
+
+      $('.confirmEdit' + warning.id).data('warn', warning);
+
+      $('.confirmEdit' + warning.id).on("click", function() {
+         // confirm edit... lets see how and ... bla
+        var warn = $(this).data('warn');
+        var cur = 0;
+        $(this).parent().parent().children().each(function(){
+          if(cur == 1)
+            warn.title = $(this).children().val();
+          else if(cur == 2)
+            warn.text = $(this).children().val();
+          else if(cur == 3)
+            warn.comment = $(this).children().val();
+
+          cur++;
+        });
+
+        bindCommonWarns();
+        bindProfilePictureWarns();
+        bindProfileContentWarns();
+
+        baseVariables.settings.warnTextCollection.save();
+      });
+    }
+
+    function bindCommonWarns()
+    {
+      $('#commonWarnDiv tr:not(:first-child)').remove();
+      var i = 0;
+
+      for(i = 0; i < baseVariables.settings.warnTextCollection.commonWarns.length; i++)
+      {
+        $("#commonWarnDiv").append(`
+              <tr>
+                <td style="width: 0px; display: none;" id="` + baseVariables.settings.warnTextCollection.commonWarns[i].id + `">
+                <td>` + baseVariables.settings.warnTextCollection.commonWarns[i].title + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.commonWarns[i].text + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.commonWarns[i].comment + `</td>
+                <td><center><a href="#" class="edit` + baseVariables.settings.warnTextCollection.commonWarns[i].id + `">✏️</a></center></td>
+                <td><center><a href="#" class="remove` + baseVariables.settings.warnTextCollection.commonWarns[i].id + `">❌</a></center></td>
+              </tr>`);
+
+          $('.edit' + baseVariables.settings.warnTextCollection.commonWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.commonWarns[i]);
+          $('.remove' + baseVariables.settings.warnTextCollection.commonWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.commonWarns[i]);
+
+          $('.edit' + baseVariables.settings.warnTextCollection.commonWarns[i].id).on("click", function() {
+            setEditable($(this).data('warn'));
+          });
+
+          $('.remove' + baseVariables.settings.warnTextCollection.commonWarns[i].id).on("click", function() {
+            removeWarning(baseVariables.settings.warnTextCollection.commonWarns, $(this).data('warn'));
+          });
+      }
+    }
+
+    function bindProfileContentWarns()
+    {
+      $('#profileContentWarnDiv tr:not(:first-child)').remove();
+      var i = 0;
+      for(i = 0; i < baseVariables.settings.warnTextCollection.profileContentWarns.length; i++)
+      {
+        $("#profileContentWarnDiv").append(`
+              <tr>
+                <td style="width: 0px; display: none;" id="` + baseVariables.settings.warnTextCollection.profileContentWarns[i].id + `">
+                <td>` + baseVariables.settings.warnTextCollection.profileContentWarns[i].title + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.profileContentWarns[i].text + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.profileContentWarns[i].comment + `</td>
+                <td><center><a href="#" class="edit` + baseVariables.settings.warnTextCollection.profileContentWarns[i].id + `">✏️</a></center></td>
+                <td><center><a href="#" class="remove` + baseVariables.settings.warnTextCollection.profileContentWarns[i].id + `">❌</a></center></td>
+              </tr>`);
+
+
+          $('.edit' + baseVariables.settings.warnTextCollection.profileContentWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.profileContentWarns[i]);
+          $('.remove' + baseVariables.settings.warnTextCollection.profileContentWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.profileContentWarns[i]);
+
+          $('.edit' + baseVariables.settings.warnTextCollection.profileContentWarns[i].id).on("click", function() {
+            setEditable($(this).data('warn'));
+          });
+
+          $('.remove' + baseVariables.settings.warnTextCollection.profileContentWarns[i].id).on("click", function() {
+            removeWarning(baseVariables.settings.warnTextCollection.profileContentWarns, $(this).data('warn'));
+          });
+      }
+    }
+
+    function bindProfilePictureWarns()
+    {
+      $('#profilePictureWarnDiv tr:not(:first-child)').remove();
+      var i = 0;
+      for(i = 0; i < baseVariables.settings.warnTextCollection.profilePictureWarns.length; i++)
+      {
+        $("#profilePictureWarnDiv").append(`
+              <tr>
+                <td style="width: 0px; display: none;" id="` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id + `">
+                <td>` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].title + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].text + `</td>
+                <td style="padding-left: 5px; white-space: pre-wrap;">` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].comment + `</td>
+                <td><center><a href="#" class="edit` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id + `">✏️</a></center></td>
+                <td><center><a href="#" class="remove` + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id + `">❌</a></center></td>
+              </tr>`);
+
+          $('.edit' + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.profilePictureWarns[i]);
+          $('.remove' + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id).data('warn', baseVariables.settings.warnTextCollection.profilePictureWarns[i]);
+
+          $('.edit' + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id).on("click", function() {
+            setEditable($(this).data('warn'));
+          });
+
+          $('.remove' + baseVariables.settings.warnTextCollection.profilePictureWarns[i].id).on("click", function() {
+            removeWarning(baseVariables.settings.warnTextCollection.profilePictureWarns, $(this).data('warn'));
+          });
+      }
+    }
+
+    function bindWarns()
+    {
+      bindCommonWarns();
+      bindProfilePictureWarns();
+      bindProfileContentWarns();
+    }
+
+    function removeWarning(collection, warning)
+    {
+      collection.splice(collection.indexOf(warning), 1);
+      bindWarns();
+
+      baseVariables.settings.warnTextCollection.save();
+    }
 
     function addOverlay()
     {
@@ -168,27 +499,20 @@
                    modifyLog();
                    modifyLayout();
                    $('#showInputsLink').hide();
+                   $('.modal-content').css("height", "700px");
+                   $('.reportcontent').css("height", "650px");
                    $('.modal').show();
                    $('.reportContent').scrollTop(0);
                    $('.reportcontent .memberWrapper:last').hide();
                });
            }
         });
-
-        window.onclick = function(event) {
-            if (event.target.className == "modal") {
-                $('.modal').hide();
-            }
-        }
-
-        $('.close').on("click", function() {
-			    closeModal();
-        });
     }
 
     function closeModal()
     {
         $('.modal').hide();
+        $('.config').hide();
     }
 
     // function to modify the navigation
@@ -199,10 +523,9 @@
             $("a:contains('Hilfe')").remove();
             $("#navi a:contains('Logout')").remove();
 
-            if(enableReportRequestLink)
-                $('#navi').html('<a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | ' + $('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
-            else
-                $('#navi').html($('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
+            $('#navi').html('<span id="reportRequest" style="display: none;"><a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | </span>' + $('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
+
+            //$("#navi").html($("#navi").html().replace("Statistik", "📈 Statistik").replace("Übersicht", "🧮 Übersicht").replace("Meine Meldungen", "🚩 Meine Meldungen").replace("Suche", "🔍 Suche"));
         }
     }
 
@@ -218,9 +541,6 @@
 
             $('div.content-type-section:first > p', $logDiv).each(function (){
                   if($(this).hasClass('hilite')) {
-
-                      //$('.hilite').html($('.hilite').html().replace( $reportedUser, '<a href="#" class="aiLinkBSF">' +  $reportedUser + '</a>'));
-                      //console.log('created link');
                       return;
                   }
                   else if($('b:first', $(this)).text().includes(reportingUser)) {
@@ -250,19 +570,19 @@
 
        removeSanction('sanction_contactfilterchange');
 
-       if(reportType.trim() != "Spielverhalten melden")
+       if(baseVariables.reportType.trim() != "Spielverhalten melden")
          removeSanction('sanction_gamelock');
 
-       if(reportType.trim() != "Fotokommentar melden")
+       if(baseVariables.reportType.trim() != "Fotokommentar melden")
          removeSanction('sanction_commentdelete');
 
-       if(reportType.trim() != "Suizid-/Amokankündigung melden")
+       if(baseVariables.reportType.trim() != "Suizid-/Amokankündigung melden")
          removeSanction('sanction_emergency');
 
-       if(reportType.trim() != "Alter / Geschlecht melden")
+       if(baseVariables.reportType.trim() != "Alter / Geschlecht melden")
          removeSanction('sanction_profilecontentchange');
 
-       switch(reportType.trim())
+       switch(baseVariables.reportType.trim())
        {
            case "Jugendgefährdende Aussage melden":
            case "Sexuelle Belästigung melden":
@@ -430,8 +750,7 @@
 
 
          autoRefresh();
-         console.log('Refreshed content table');
-       }, 5000);
+       }, baseVariables.settings.overViewRefreshInterval);
       }
     }
 
@@ -472,13 +791,13 @@
     // copy macro to clipboard and set actions
     function copyMacroCommand(id)
     {
-       var reportedUser = $($("h3 div span").filter(function () { return $(this).css('color') === 'rgb(153, 0, 0)'; }).get(0)).text();
        resetCommandInputs();
        let command = "";
+
        switch(id)
        {
            case "botCommand":
-               command = '/macro bot:' + reportedUser + '|' + reportID;
+               command = '/macro bot:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
                $('#sanction_ban').prop("checked", true);
@@ -487,7 +806,7 @@
                $('textarea[id="comment"]').text('Botnick, entsprechend gesperrt.');
                break;
            case "scammerCommand":
-               command = '/macro scammer:' + reportedUser + '|' + reportID;
+               command = '/macro scammer:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
                $('#sanction_ban').prop("checked", true);
@@ -497,7 +816,7 @@
                $('textarea[id="comment"]').text('Inhalte weisen deutlich auf einen Scammer hin. Entsprechend gesperrt.');
                break;
            case "ftCommand":
-               command = '/macro ft:' + reportedUser + '|' + reportID;
+               command = '/macro ft:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
                $('#sanction_ban').prop("checked", true);
@@ -507,7 +826,7 @@
                $('textarea[id="comment"]').text('[Bildbeschreibung]\r\n\r\nAls pornographisch / freizügig entfernt, 7 Tage ULS und permanent gesperrt.');
                break;
            case "scamCommand":
-               command = '/macro scam:' + reportedUser + '|' + reportID;
+               command = '/macro scam:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
 
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
@@ -518,7 +837,7 @@
                $('textarea[id="comment"]').text('Scamfunde: [Scamlink]\r\n\r\nPermanent gesperrt und als Fakeversuch ausgeblendet.');
                break;
            case "tyCommand":
-               command = '/macro ty:' + reportedUser + '|' + reportID;
+               command = '/macro ty:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
 
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
@@ -529,7 +848,7 @@
                 $('textarea[id="comment"]').text('Gemeldete Person ist nach eigener Angabe jünger als 16. Entsprechend als zu jung gesperrt.');
                break;
            case "vslCommand":
-               command = '/macro verifylock:' + reportedUser + '|Berechtigte Zweifel an den Angaben - NW erforderlich|' + reportID;
+               command = '/macro verifylock:' + baseVariables.reportedUser + '|Berechtigte Zweifel an den Angaben - NW erforderlich|' + baseVariables.reportID;
 
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
@@ -537,7 +856,7 @@
                 $('textarea[id="comment"]').text('Berechtigte Zweifel an den Angaben.\r\n\r\n[Begründung]');
                break;
            case "nagbCommand":
-               command = '/macro nagb:' + reportedUser + '|' + reportID;
+               command = '/macro nagb:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
 
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
@@ -553,7 +872,7 @@
                $('textarea[id="comment"]').text('Als Fake gesperrt.\r\n\r\n[Begründung]');
               break;
             case "vknCommand":
-               command = '/macro vkn:' + reportedUser + '|' + reportID;
+               command = '/macro vkn:' + baseVariables.reportedUser + '|' + baseVariables.reportID;
                $('select[name="judgement"] option[value="1"]').prop("selected", true);
                $('#sanction_permanentlock').prop("checked", true);
                $('#sanction_ban').prop("checked", true);
@@ -578,9 +897,8 @@
 
     function hideCommandsByReportType()
     {
-      var reportType = $("h3:contains('Typ:')").children().last().text().replace($("h3:contains('Typ:')").children().last().children().first().text(), '');
 
-      if(!reportType.trim().startsWith("Alter"))
+      if(!baseVariables.reportType.trim().startsWith("Alter"))
         $('#verifyCommands').hide();
       else
       {
@@ -588,11 +906,11 @@
         $('#warningTexts').hide();
       }
 
-      if(!reportType.trim().startsWith("Profilbilder"))
+      if(!baseVariables.reportType.trim().startsWith("Profilbilder"))
         $('#profileCommands').hide();
 
 
-      if(reportType.trim().startsWith("Profil"))
+      if(baseVariables.reportType.trim().startsWith("Profil"))
         $('#commonTexts').hide();
       else
       {
@@ -600,11 +918,11 @@
         $('#profilePictures').hide();
       }
 
-      if(reportType.trim().startsWith("Profilbilder"))
+      if(baseVariables.reportType.trim().startsWith("Profilbilder"))
         $('#profileContents').hide();
 
 
-      if(reportType.trim().startsWith("Profilinhalt"))
+      if(baseVariables.reportType.trim().startsWith("Profilinhalt"))
         $('#profilePictures').hide();
     }
 
@@ -613,13 +931,28 @@
       switch(id)
       {
         case "profileContents":
-              showWarnings(profileContentWarnTexts, "Profilinhalt");
+              if(!baseVariables.settings.warnTextCollection || !baseVariables.settings.warnTextCollection.profileContentWarns || baseVariables.settings.warnTextCollection.profileContentWarns.length == 0)
+              {
+                alert("Keine Verwarntexte für Profilinhalte vorhanden. Bitte erstellen oder importieren.");
+              }
+              else
+                showWarnings(baseVariables.settings.warnTextCollection.profileContentWarns, "Profilinhalt");
           break;
         case "commonTexts":
-              showWarnings(commonWarnTexts, "Allgemein");
+              if(!baseVariables.settings.warnTextCollection || !baseVariables.settings.warnTextCollection.commonWarns || baseVariables.settings.warnTextCollection.commonWarns.length == 0)
+              {
+                alert("Keine Verwarntexte vorhanden. Bitte erstellen oder importieren.");
+              }
+              else
+                showWarnings(baseVariables.settings.warnTextCollection.commonWarns, "Allgemein");
           break;
         case "profilePictures":
-              showWarnings(profilePictureWarnTexts, "Profilbilder");
+              if(!baseVariables.settings.warnTextCollection || !baseVariables.settings.warnTextCollection.profilePictureWarns || baseVariables.settings.warnTextCollection.profilePictureWarns.length == 0)
+              {
+                alert("Keine Verwarntexte für Profilbilder vorhanden. Bitte erstellen oder importieren.");
+              }
+              else
+                showWarnings(baseVariables.settings.warnTextCollection.profilePictureWarns, "Profilbilder");
           break;
       }
     }
@@ -628,11 +961,11 @@
     {
       $('.reportContent').html('');
 
-      $('.reportContent').append("<center><h2>Verwarntexte - " + type + "<h2></center>");
+      $('.reportContent').append("⚠️ <center><h2>Verwarntexte - " + type + "<h2></center>");
 
       for(var i = 0; i < warnings.length; i++)
       {
-        $('.reportContent').append("<details><summary>" + warnings[i].title + "</summary><textarea style='width: 100%; height: 50px;'>" + warnings[i].text.replace('{user}', $reportedUser)  + "</textarea><input class='modern-button copyWarn' id='"+ warnings[i].title + "' name='" + type + "' style='width: 100%' type='button' value='Kopieren' /></details><br>");
+        $('.reportContent').append("<details><summary>" + warnings[i].title + "</summary><textarea style='width: 100%; height: 50px;'>" + warnings[i].text.replace('{user}', baseVariables.reportedUser)  + "</textarea><input class='modern-button copyWarn' id='"+ warnings[i].title + "' name='" + type + "' style='width: 100%' type='button' value='Kopieren' /></details><br>");
       }
 
       $('.modal-content').css('height', '400px');
@@ -648,17 +981,17 @@
         switch(name)
         {
           case "Allgemein":
-            warnArray = commonWarnTexts;
+            warnArray = baseVariables.settings.warnTextCollection.commonWarns;
             break;
           case "Profilinhalt":
-            warnArray = profileContentWarnTexts;
+            warnArray = baseVariables.settings.warnTextCollection.profileContentWarns;
             break;
           case "Profilbilder":
-            warnArray = profilePictureWarnTexts;
+            warnArray = baseVariables.settings.warnTextCollection.profilePictureWarns;
             break;
         }
 
-        var command = "/m " + $reportedUser + ":Verwarnung§";
+        var command = "/m " + baseVariables.reportedUser + ":Verwarnung§";
 
         warnArray.forEach((item) => {
           if(item.title == id)
@@ -736,21 +1069,13 @@
         $('#main div:contains("Du bist eingeloggt")').addClass('loginDetail');
 
         if(!$( ".logoutLink" ).length)
-            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><a href="#" id="changelog">Changelog</a><br><br><select id="styleSelect" name="style"><option value="Light">Light</option><option value="Dark">Dark</option></select>');
+            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><a href="#" id="settings">⚙️ Einstellungen</a> | <a href="#" id="changelog">📋 Changelog</a>');
 
         $('#changelog').click(function(){ showChangeLog(); return false; });
 
-        currentStyle = localStorage.getItem("reportStyle") ?? "Light";
+        $('#settings').click(function(){ bindWarns(); $('.config').show(); return false; });
 
-        $('#styleSelect').val(currentStyle);
-        setCurrentStyle();
-
-        $('#styleSelect').change(function() {
-            currentStyle = $(this).val();
-            setCurrentStyle();
-        });
-
-        $('button,input[type="submit"]').addClass('modern-button');
+        $('button,input[type="submit"]').not('.tablinks').addClass('modern-button');
 
         $("div:contains('Kontaktfilter:')").last().html('<b>' + $("div:contains('Kontaktfilter:')").last().html() + '</b>');
 
@@ -763,18 +1088,6 @@
              $('#header').html('<br>Knuddels - Meldesystem<div id="reportInfo">Meldung: ' + reportInfo + '</div>');
         else
              $('#header').html('<br>Knuddels - Meldesystem');
-
-        /*$('#culprit0subcase' + reportID.replace("*", "").replaceAll(".", "") + 'AddInfo').css('max-width', '750px');
-        $('#culprit0subcase' + reportID.replace("*", "").replaceAll(".", "") + 'AddInfo').children().each(function() {
-           $(this).css('max-width', '750px');
-        });
-
-        $('#accuser0AddInfo').css('max-width', '800px');
-        $('#accuser0AddInfo').children().each(function() {
-           $(this).css('max-width', '800px');
-        });*/
-
-        var cnt = 0;
 
         $('hr').each(function () {
            $(this).nextUntil('hr').wrapAll('<div class="memberWrapper"></div>');
@@ -838,6 +1151,14 @@
 
       setReportLinks();
       addTextFilter();
+    }
+
+    function showReportLink()
+    {
+      if(baseVariables.settings.enableReportRequestlink == "an")
+        $('#reportRequest').css("display", "inline-block");
+      else
+        $('#reportRequest').css("display", "none");
     }
 
     function addTextFilter()
@@ -906,21 +1227,21 @@
 
     function setCurrentStyle()
     {
-      switch(currentStyle)
+      switch(baseVariables.settings.currentStyle)
       {
         case "Light":
-          $('html,#main,.modal-content').css('background-color', 'white');
+          $('html,#main,.modal-content,.config-content,section, li label').css('background-color', 'white');
           $('html').css('filter', 'invert(0%) hue-rotate(0deg)');
           $('#header,#navi,.modern-button,.loginDetail,img').css('filter', 'invert(0%) hue-rotate(0deg)');
           break;
         case "Dark":
-          $('html,#main,.modal-content').css('background-color', 'lightgray');
+          $('html,#main,.modal-content,.config-content,section,.config-content, li label').css('background-color', 'lightgray');
           $('html').css('filter', 'invert(100%) hue-rotate(180deg)');
           $('#header,#navi,.modern-button,.loginDetail,img').css('filter', 'invert(180%) hue-rotate(180deg)');
           break;
       }
 
-      localStorage.setItem("reportStyle", currentStyle);
+      baseVariables.settings.save();
     }
 
 
@@ -986,7 +1307,7 @@
                padding-right: 5px;
 			}
 
-			.reportContent .content-type-section p {
+			.configContent .reportContent .content-type-section p {
 			   padding: 0;
 			   margin: 0;
                width: 730;
@@ -1048,7 +1369,7 @@
               //max-width: 700px;
             }
 
-            .reportContent .commentOutput {
+            .configContent .reportContent .commentOutput {
                width: 600px;
             }
 
@@ -1214,7 +1535,7 @@
               box-shadow: none;
             }
 
-            .modal {
+            .modal, .config {
               font-size: 13px;
               display: none; /* Hidden by default */
               position: fixed; /* Stay in place */
@@ -1244,7 +1565,7 @@
             }
 
             /* Modal Content */
-            .modal-content {
+            .config-content, .modal-content {
               background-color: white;
               margin: auto;
               padding: 20px;
@@ -1254,7 +1575,7 @@
               border-radius: 10px;
             }
 
-            .reportContent {
+            .configContent, .reportContent {
               height: 100px;
               height: 650px;
               overflow-x: hidden;
@@ -1279,17 +1600,64 @@
               cursor: pointer;
             }
 
-            #changelog {
+            #changelog, #settings {
                font-size: 10px;
             }
+            ul#tabs {
+              position: relative;
+              list-style-type: none;
+              padding: 0;
+              width: 100%;
+              -webkit-filter: drop-shadow(
+                0 0 8px rgba(0,0,0,0.2));
 
-        `;
+              li {
+                float: left;
+
+                > input {
+                  display: none;
+
+                  &:checked {
+                    ~ label {
+                      color: #000;
+                        border-bottom-color: transparent;
+                    }
+                    ~ section {
+                      display: block;
+                      z-index: 1;
+                      -webkit-transition-delay: 0.5s
+                    }
+                  }
+                }
+                > label {
+                  display: block;
+                  padding: 8px;
+                  background: #fff;
+                  border-top-left-radius: 4px;
+                  border-top-right-radius: 4px;
+                  border-right: 1px solid rgba(0,0,0, 0.2);
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+                }
+                > section {
+                  position: absolute;
+                  display: none;
+                  overflow: hidden;
+                  padding: 8px;
+                  left: 0;
+                  right: 0;
+                  background: #fff;
+                  text-align: left;
+                  -webkit-transition: max-height 0.5s ease-in-out;
+                  border-bottom-left-radius: 4px;
+                  border-bottom-right-radius: 4px;
+                }
+              }
+            }
+       `;
 
         $('style').text(style);
     }
 
     // bootstrap the main script
     bootStrap();
-    // generate the user defined warn texts
-    generateWarnTexts();
 })();
