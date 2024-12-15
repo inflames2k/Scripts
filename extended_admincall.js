@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.8
+// @version      2.7.9
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1005,7 +1005,7 @@ class BaseVariables
         warnArray.forEach((item) => {
           if(item.title == id)
           {
-            command = command + item.text;
+            command = command + item.text.replace('{user}', baseVariables.reportedUser);
 
             $('textarea[id="comment"]').text(item.comment);
           }
