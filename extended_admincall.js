@@ -47,7 +47,10 @@ class WarnTextCollection
   {
     var result = JSON.parse(localStorage.getItem('warnTexts'));
 
-    return new WarnTextCollection(result.commonWarns, result.profileContentWarns, result.profilePictureWarns);
+    if(result != null)
+      return new WarnTextCollection(result.commonWarns ?? [], result.profileContentWarns ?? [], result.profilePictureWarns ?? []);
+    else
+      return new WarnTextCollection([], [], []);
   }
 }
 
