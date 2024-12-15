@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.9
+// @version      2.7.10
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -65,6 +65,7 @@ class Settings
      this.enableReportRequestlink = localStorage.getItem("newReportLink") ?? "aus";
      this.currentStyle = localStorage.getItem("reportStyle") ?? "Light";
      this.overViewRefreshInterval = localStorage.getItem("refreshInterval") ?? 5000;
+     this.expandReportContents = localStorage.getItem("expandReportContents") ?? "nein";
      this.warnTextCollection = WarnTextCollection.load();
    }
 
@@ -73,6 +74,7 @@ class Settings
      localStorage.setItem("newReportLink", this.enableReportRequestlink);
      localStorage.setItem("reportStyle", this.currentStyle);
      localStorage.setItem("refreshInterval", this.overViewRefreshInterval);
+     localStorage.setItem("expandReportContents", this.expandReportContents);
      this.warnTextCollection.save();
    }
 }
@@ -89,6 +91,8 @@ class BaseVariables
     this.changeLogUri = 'https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/changelog.html';
     this.reportType = $("h3:contains('Typ:')").children().last().text().replace($("h3:contains('Typ:')").children().last().children().first().text(), '');
 
+    this.currentUser = $('div:contains("Du bist eingeloggt als:") > b').text().trim();
+    this.processedUser = $('div:contains("Aktuell zugewiesen")').last().next().text().trim();
   }
 }
 
@@ -114,6 +118,9 @@ class BaseVariables
 
         $('#reportLinkSelect').val(baseVariables.settings.enableReportRequestlink);
         showReportLink();
+
+        $('#expandReportContent').val(baseVariables.settings.expandReportContents);
+        expandReportContents();
 
         $('#refreshInterval').val(baseVariables.settings.overViewRefreshInterval / 1000);
 
@@ -167,6 +174,11 @@ class BaseVariables
                         <td style="width: 0px"></td>
                         <td>🔗 Link "Meldung beantragen":</td>
                         <td><select id="reportLinkSelect" name="reportLink" style="width: 100px"><option value="an">An</option><option value="aus">Aus</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert den Link "Meldung beantragen" im Menü des Meldesystems.</span></td>
+                      </tr>
+                      <tr>
+                        <td style="width: 0px"></td>
+                        <td>🔗 Meldeinhalte ausklappen:</td>
+                        <td><select id="expandReportContent" name="reportContent" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die ausgeklappte Ansicht der Meldeinhalte (keine Scrollbar).</span></td>
                       </tr>
                       </table>
                     </div>
@@ -268,6 +280,13 @@ class BaseVariables
            baseVariables.settings.save();
 
            showReportLink();
+        });
+
+        $('#expandReportContent').change(function() {
+          baseVariables.settings.expandReportContents = $(this).val();
+          baseVariables.settings.save();
+
+          expandReportContents();
         });
 
         $('#refreshInterval').change(function() {
@@ -556,9 +575,7 @@ class BaseVariables
             $(".hilite").css("background-color", "#F3E2A9");
             $(".bsf").css("background-color", "#CEF6CE");
 
-            $(this).css("max-height", 'none');
-
-            $('a:contains("Bereich voll anzeigen")').text("Bereich eingrenzen");
+            expandReportContents();
         });
 
         $("h3:contains('Gemeldete Inhalte')").each(function(i){
@@ -569,6 +586,14 @@ class BaseVariables
        $('.dataFilter').on("click", function() {
           filterLog($(this).attr('id'));
        });
+    }
+
+    function expandReportContents()
+    {
+      if(baseVariables.settings.expandReportContents == "ja" && $('a[onclick*="borderize(this,0)"], a[onclick*="borderize(this,1)"]').text() != "Bereich eingrenzen")
+        $('a[onclick*="borderize(this,0)"], a[onclick*="borderize(this,1)"]').click();
+      else if(baseVariables.settings.expandReportContents == "nein" && $('a[onclick*="borderize(this,0)"], a[onclick*="borderize(this,1)"]').text() == "Bereich eingrenzen")
+        $('a[onclick*="borderize(this,0)"], a[onclick*="borderize(this,1)"]').click();
     }
 
 
@@ -1256,12 +1281,6 @@ class BaseVariables
               $(this).css('display', 'none');
           });
         });
-
-        try
-        {
-          showInputs();
-        }
-        catch {}
       }
     }
 
@@ -1301,6 +1320,13 @@ class BaseVariables
             $(this).html($(this).html().replaceAll(m[0], '<a target="_blank" href="https://www6.knuddels.de:8443/ac/ac_viewcase.pl?domain=knuddels.de&id=' + m[0].replaceAll("*", "").replaceAll('.', "") + '">' + m[0] + '</a>'));
           }
         });
+
+        try
+        {
+          if($('#header:contains("geschlossen")') && baseVariables.processedUser != baseVariables.currentUser)
+            showInputs();
+        }
+        catch {}
       }
     }
 
