@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.12
+// @version      2.7.13
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -66,6 +66,9 @@ class Settings
      this.currentStyle = localStorage.getItem("reportStyle") ?? "Light";
      this.overViewRefreshInterval = localStorage.getItem("refreshInterval") ?? 5000;
      this.expandReportContents = localStorage.getItem("expandReportContents") ?? "nein";
+     this.enableReportOverlay = localStorage.getItem("enableReportOverlay") ?? "ja";
+     this.enableAutoRefresh = localStorage.getItem("enableAutoRefresh") ?? "nein";
+     this.enableActionFilter = localStorage.getItem("enableActionFilter") ?? "ja";
      this.warnTextCollection = WarnTextCollection.load();
    }
 
@@ -75,6 +78,9 @@ class Settings
      localStorage.setItem("reportStyle", this.currentStyle);
      localStorage.setItem("refreshInterval", this.overViewRefreshInterval);
      localStorage.setItem("expandReportContents", this.expandReportContents);
+     localStorage.setItem("enableReportOverlay", this.enableReportOverlay);
+     localStorage.setItem("enableAutoRefresh", this.enableAutoRefresh);
+     localStorage.setItem("enableActionFilter", this.enableActionFilter);
      this.warnTextCollection.save();
    }
 }
@@ -112,6 +118,10 @@ class BaseVariables
         modifyNavigation();
         modifyLayout();
         $('#footer').html($('#footer').html() + " - " + GM_info.script.name + " " + GM_info.script.version);
+
+        $('#overlaySelect').val(baseVariables.settings.enableReportOverlay);
+        $('#enableAutoRefresh').val(baseVariables.settings.enableAutoRefresh);
+        $('#enableActionFilter').val(baseVariables.settings.enableActionFilter);
 
         $('#styleSelect').val(baseVariables.settings.currentStyle);
         setCurrentStyle();
@@ -159,27 +169,42 @@ class BaseVariables
                     <div class="memberWrapper" id="commonSettings">
                       <h3>⚙️ Allgemeine Einstellungen</h3>
                       <table style="width: 100%">
-                      <tr></tr>
-                      <tr>
-                        <td style="width: 0px"></td>
-                        <td>🕔 Aktualisierung Übersicht:</td>
-                        <td><input type="number" step="1" id="refreshInterval" required style="width: 100px"><br><br><span style="font-size: 12px; padding-top: 5px">Legt das Aktualisierungsinterval (s) für die Übersicht fest (Min: 5 Sekunden, Max: 360 Sekunden).</span></td>
-                      </tr>
-                      <tr>
-                        <td style="width: 0px"></td>
-                        <td style="width: 200px">🔆 Darstellungsmodus:</td>
-                        <td><select id="styleSelect" name="style" style="width: 100px"><option value="Light">Light</option><option value="Dark">Dark</option></select><br><br><span style="font-size: 12px; padding-top: 10px">Schaltet den Anzeigemodus zwischen Light und Dark um.</span><br><br></td>
-                      </tr>
-                      <tr>
-                        <td style="width: 0px"></td>
-                        <td>🔗 Link "Meldung beantragen":</td>
-                        <td><select id="reportLinkSelect" name="reportLink" style="width: 100px"><option value="an">An</option><option value="aus">Aus</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert den Link "Meldung beantragen" im Menü des Meldesystems.</span></td>
-                      </tr>
-                      <tr>
-                        <td style="width: 0px"></td>
-                        <td>🔗 Meldeinhalte ausklappen:</td>
-                        <td><select id="expandReportContent" name="reportContent" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die ausgeklappte Ansicht der Meldeinhalte (keine Scrollbar).</span></td>
-                      </tr>
+                        <tr></tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>🕔 Aktualisierung Übersicht:</td>
+                          <td><select id="enableAutoRefresh" name="autoRefresh" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die automatische Aktualisierung der Übersicht.</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>🕔 Aktualisierung Übersicht:</td>
+                          <td><input type="number" step="1" id="refreshInterval" required style="width: 100px"><br><br><span style="font-size: 12px; padding-top: 5px">Legt das Aktualisierungsinterval (s) für die Übersicht fest (Min: 5 Sekunden, Max: 360 Sekunden).</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>🖼️ Overlay Meldung anzeigen:</td>
+                          <td><select id="overlaySelect" name="overlaySelect" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die Anzeige eines Overlays mit Inhalten der Meldung bei Klick auf eine Tabellenzeile.</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td style="width: 200px">🔆 Darstellungsmodus:</td>
+                          <td><select id="styleSelect" name="style" style="width: 100px"><option value="Light">Light</option><option value="Dark">Dark</option></select><br><br><span style="font-size: 12px; padding-top: 10px">Schaltet den Anzeigemodus zwischen Light und Dark um.</span><br><br></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>🔗 Link "Meldung beantragen":</td>
+                          <td><select id="reportLinkSelect" name="reportLink" style="width: 100px"><option value="an">An</option><option value="aus">Aus</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert den Link "Meldung beantragen" im Menü des Meldesystems.</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>↕ Meldeinhalte ausklappen:</td>
+                          <td><select id="expandReportContent" name="reportContent" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die ausgeklappte Ansicht der Meldeinhalte (keine Scrollbar).</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>▼ Maßnahmen filtern:</td>
+                          <td><select id="enableActionFilter" name="actionFilter" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die Filterung der Maßnahmen nach Meldetypen.</span></td>
+                        </tr>
                       </table>
                     </div>
                   </section>
@@ -280,6 +305,22 @@ class BaseVariables
            baseVariables.settings.save();
 
            showReportLink();
+        });
+
+        $('#overlaySelect').change(function() {
+          baseVariables.settings.enableReportOverlay = $(this).val();
+
+          baseVariables.settings.save();
+        });
+
+        $('#enableAutoRefresh').change(function() {
+          baseVariables.settings.enableAutoRefresh = $(this).val();
+          baseVariables.settings.save();
+        })
+
+        $('#enableActionFilter').change(function() {
+          baseVariables.settings.enableActionFilter = $(this).val();
+          baseVariables.settings.save();
         });
 
         $('#expandReportContent').change(function() {
@@ -513,22 +554,24 @@ class BaseVariables
 					</div>
 				</div>`);
 
-
         // make full rows clickable in tables
         $(document).on("click", 'td:not(:first-child)', function() {
-           var href = $('b a', $(this).parent()).attr('href');
-           if(href)
+           if(baseVariables.settings.enableReportOverlay == "ja")
            {
-               $('.reportContent').load(href + ' #content', function() {
-                   modifyLog();
-                   modifyLayout();
-                   $('#showInputsLink').hide();
-                   $('.modal-content').css("height", "700px");
-                   $('.reportcontent').css("height", "650px");
-                   $('.modal').show();
-                   $('.reportContent').scrollTop(0);
-                   $('.reportcontent .memberWrapper:last').hide();
-               });
+             var href = $('b a', $(this).parent()).attr('href');
+             if(href)
+             {
+                 $('.reportContent').load(href + ' #content', function() {
+                     modifyLog();
+                     modifyLayout();
+                     $('#showInputsLink').hide();
+                     $('.modal-content').css("height", "700px");
+                     $('.reportcontent').css("height", "650px");
+                     $('.modal').show();
+                     $('.reportContent').scrollTop(0);
+                     $('.reportcontent .memberWrapper:last').hide();
+                 });
+             }
            }
         });
     }
@@ -600,127 +643,128 @@ class BaseVariables
     //  function to filter available actions
     function filterActions()
     {
-       var reportType = $("h3:contains('Typ:')").children().last().text().replace($("h3:contains('Typ:')").children().last().children().first().text(), '');
+      if(baseVariables.settings.enableActionFilter == "ja")
+      {
+         var reportType = $("h3:contains('Typ:')").children().last().text().replace($("h3:contains('Typ:')").children().last().children().first().text(), '');
 
-       removeSanction('sanction_contactfilterchange');
+         removeSanction('sanction_contactfilterchange');
 
-       if(baseVariables.reportType.trim() != "Spielverhalten melden")
-         removeSanction('sanction_gamelock');
+         if(baseVariables.reportType.trim() != "Spielverhalten melden")
+           removeSanction('sanction_gamelock');
 
-       if(baseVariables.reportType.trim() != "Fotokommentar melden")
-         removeSanction('sanction_commentdelete');
+         if(baseVariables.reportType.trim() != "Fotokommentar melden")
+           removeSanction('sanction_commentdelete');
 
-       if(baseVariables.reportType.trim() != "Suizid-/Amokankündigung melden")
-         removeSanction('sanction_emergency');
+         if(baseVariables.reportType.trim() != "Suizid-/Amokankündigung melden")
+           removeSanction('sanction_emergency');
 
-       if(baseVariables.reportType.trim() != "Alter / Geschlecht melden")
-         removeSanction('sanction_profilecontentchange');
+         if(baseVariables.reportType.trim() != "Alter / Geschlecht melden")
+           removeSanction('sanction_profilecontentchange');
 
-       switch(baseVariables.reportType.trim())
-       {
-           case "Jugendgefährdende Aussage melden":
-           case "Sexuelle Belästigung melden":
-           case "Extremistische Aussage melden":
-           case "Aussage melden":
-               removeSanctionGroup("MYCHANNEL");
-               removeSanctionGroup("SPIELE");
-               removeSanctionGroup("PROFIL");
+         switch(baseVariables.reportType.trim())
+         {
+             case "Jugendgefährdende Aussage melden":
+             case "Sexuelle Belästigung melden":
+             case "Extremistische Aussage melden":
+             case "Aussage melden":
+                 removeSanctionGroup("MYCHANNEL");
+                 removeSanctionGroup("SPIELE");
+                 removeSanctionGroup("PROFIL");
 
-               removeSanction('sanction_commentdelete');
+                 removeSanction('sanction_commentdelete');
 
-               removeMyChannelActions();
-               removeFotoActions();
-               break;
-           case "Alter / Geschlecht melden":
-               removeSanctionGroup("MYCHANNEL");
-               removeSanctionGroup("SPIELE");
+                 removeMyChannelActions();
+                 removeFotoActions();
+                 break;
+             case "Alter / Geschlecht melden":
+                 removeSanctionGroup("MYCHANNEL");
+                 removeSanctionGroup("SPIELE");
 
-               removeSanction('sanction_mute');
-               removeSanction('sanction_reprimand');
-               removeSanction('sanction_temporarylock');
-               removeSanction('sanction_kick');
-               removeSanction('sanction_commentdelete');
+                 removeSanction('sanction_mute');
+                 removeSanction('sanction_reprimand');
+                 removeSanction('sanction_temporarylock');
+                 removeSanction('sanction_kick');
+                 removeSanction('sanction_commentdelete');
 
-               removeCMActions();
-               removeFotoActions();
-               removeMyChannelActions();
-               break;
-           case "Suizid-/Amokankündigung melden":
-               removeSanctionGroup("MYCHANNEL");
-               removeSanctionGroup("SPIELE");
-               removeSanctionGroup("PROFIL");
+                 removeCMActions();
+                 removeFotoActions();
+                 removeMyChannelActions();
+                 break;
+             case "Suizid-/Amokankündigung melden":
+                 removeSanctionGroup("MYCHANNEL");
+                 removeSanctionGroup("SPIELE");
+                 removeSanctionGroup("PROFIL");
 
-               removeSanction('sanction_reprimand');
-               removeSanction('sanction_ban');
-               removeSanction('sanction_kick');
-               removeSanction('sanction_profilecontentdelete');
-               removeSanction('sanction_commentdelete');
+                 removeSanction('sanction_reprimand');
+                 removeSanction('sanction_ban');
+                 removeSanction('sanction_kick');
+                 removeSanction('sanction_profilecontentdelete');
+                 removeSanction('sanction_commentdelete');
 
-               removeCMActions();
-               removeFotoActions();
-               removeMyChannelActions();
-               break;
-           case "Spielverhalten melden":
-               removeSanctionGroup("ADMIN");
-               removeSanctionGroup("PROFIL");
-               removeSanctionGroup("MYCHANNEL");
+                 removeCMActions();
+                 removeFotoActions();
+                 removeMyChannelActions();
+                 break;
+             case "Spielverhalten melden":
+                 removeSanctionGroup("ADMIN");
+                 removeSanctionGroup("PROFIL");
+                 removeSanctionGroup("MYCHANNEL");
 
-               removeSanction('sanction_mute');
-               removeSanction('sanction_temporarylock');
-               removeSanction('sanction_permanentlock');
-               removeSanction('sanction_ban');
-               removeSanction('sanction_kick');
-               removeSanction('sanction_profilecontentdelete');
-               removeSanction('sanction_commentdelete');
+                 removeSanction('sanction_mute');
+                 removeSanction('sanction_temporarylock');
+                 removeSanction('sanction_permanentlock');
+                 removeSanction('sanction_ban');
+                 removeSanction('sanction_kick');
+                 removeSanction('sanction_profilecontentdelete');
+                 removeSanction('sanction_commentdelete');
 
-               removeCMActions();
-               removeFotoActions();
-               removeMyChannelActions();
-               break;
-           case "Profilbilder melden (Fotomeet)":
-           case "Profilbilder melden":
-               removeSanctionGroup("MYCHANNEL");
-               removeSanctionGroup("SPIELE");
+                 removeCMActions();
+                 removeFotoActions();
+                 removeMyChannelActions();
+                 break;
+             case "Profilbilder melden (Fotomeet)":
+             case "Profilbilder melden":
+                 removeSanctionGroup("MYCHANNEL");
+                 removeSanctionGroup("SPIELE");
 
-                removeSanction('sanction_kick');
-                removeSanction('sanction_profilecontentdelete');
-                removeSanction('sanction_mute');
-                removeSanction('sanction_commentdelete');
+                  removeSanction('sanction_kick');
+                  removeSanction('sanction_profilecontentdelete');
+                  removeSanction('sanction_mute');
+                  removeSanction('sanction_commentdelete');
 
-                removeCMActions();
-                removeMyChannelActions();
-               break;
-           case "Profilinhalt oder Nickname melden":
-                removeSanctionGroup("MYCHANNEL");
-                removeSanctionGroup("SPIELE");
+                  removeCMActions();
+                  removeMyChannelActions();
+                 break;
+             case "Profilinhalt oder Nickname melden":
+                  removeSanctionGroup("MYCHANNEL");
+                  removeSanctionGroup("SPIELE");
 
-                removeSanction('sanction_kick');
-                removeSanction('sanction_mute');
-                removeSanction('sanction_commentdelete');
+                  removeSanction('sanction_kick');
+                  removeSanction('sanction_mute');
+                  removeSanction('sanction_commentdelete');
 
-                removeCMActions();
-                removeFotoActions();
-                removeMyChannelActions();
-               break;
-           case "Fotokommentar melden":
-                removeSanctionGroup("MYCHANNEL");
-                removeSanctionGroup("SPIELE");
+                  removeCMActions();
+                  removeFotoActions();
+                  removeMyChannelActions();
+                 break;
+             case "Fotokommentar melden":
+                  removeSanctionGroup("MYCHANNEL");
+                  removeSanctionGroup("SPIELE");
 
-                removeSanction('sanction_mute');
-                removeSanction('sanction_ban');
-                removeSanction('sanction_kick');
-                removeSanction('sanction_profilecontentdelete');
-                removeSanction('sanction_gamelock');
+                  removeSanction('sanction_mute');
+                  removeSanction('sanction_ban');
+                  removeSanction('sanction_kick');
+                  removeSanction('sanction_profilecontentdelete');
+                  removeSanction('sanction_gamelock');
 
-                removeCMActions();
-                removeFotoActions();
-                removeMyChannelActions();
-               break;
-           case "MyChannel / Globale App melden":
-               break;
-       }
-
-       //$('#sanction_alreadydone').parent().html($('#sanction_alreadydone').parent().html().replaceAll('<br>', ''));
+                  removeCMActions();
+                  removeFotoActions();
+                  removeMyChannelActions();
+                 break;
+             case "MyChannel / Globale App melden":
+                 break;
+         }
+      }
     }
 
     function removeCMActions()
@@ -776,15 +820,17 @@ class BaseVariables
     {
       if(/ac_overview.pl/.test(window.location.href))
       {
-         setTimeout(function (){
-          $('#content').load(window.location.href + ' #content', function() {
-            modifyLayout();
-            $('input[value="Aktualisieren"]').parent().after('<div><b>Letzte Aktualisierung:</b> ' + new Date().toLocaleDateString('de-DE') + ' ' + new Date().toLocaleTimeString('de-DE') + '</div>');
-         });
-
-
-         autoRefresh();
-       }, baseVariables.settings.overViewRefreshInterval);
+             setTimeout(function (){
+               if(baseVariables.settings.enableAutoRefresh == "ja")
+               {
+                 $('#content').load(window.location.href + ' #content', function()
+                 {
+                    modifyLayout();
+                    $('input[value="Aktualisieren"]').parent().after('<div><b>Letzte Aktualisierung:</b> ' + new Date().toLocaleDateString('de-DE') + ' ' + new Date().toLocaleTimeString('de-DE') + '</div>');
+                 });
+               }
+              autoRefresh();
+            }, baseVariables.settings.overViewRefreshInterval);
       }
     }
 
@@ -1150,9 +1196,9 @@ class BaseVariables
 
         if(/ac_search.pl/.test(window.location.href))
         {
-            $('.memberWrapper:not(.reportContent .memberWrapper, .form)').css('width', '80vw');
-            $('.memberWrapper:not(.reportContent .memberWrapper, .form)').css('margin-left', 'calc(50% - 40vw)');
-            $('.memberWrapper:not(.reportContent .memberWrapper, .form)').css('margin-right', 'calc(50% - 40vw)');
+            $('.memberWrapper:not(.reportContent .memberWrapper, form, .configContent section .memberWrapper)').css('width', '80vw');
+            $('.memberWrapper:not(.reportContent .memberWrapper, form, .configContent section .memberWrapper)').css('margin-left', 'calc(50% - 40vw)');
+            $('.memberWrapper:not(.reportContent .memberWrapper, form, .configContent section .memberWrapper)').css('margin-right', 'calc(50% - 40vw)');
 
             if(!$('form[action="ac_search.pl"]').parent().hasClass('memberWrapper'))
             {
@@ -1490,7 +1536,7 @@ class BaseVariables
               //max-width: 700px;
             }
 
-            .configContent .reportContent .commentOutput {
+            .configContent .commentOutput, .reportContent .commentOutput {
                width: 600px;
             }
 
