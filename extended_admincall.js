@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.6
+// @version      2.7.7
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1167,12 +1167,6 @@ class BaseVariables
     function addReportNames()
     {
        if (window.location.href.includes("ac_overview.pl") || window.location.href.includes("ac_search.pl")) {
-        const headerRow = $('table tr').first();
-        if (headerRow.length && !headerRow.find('th:contains("Accountnamen")').length) {
-            headerRow.append('<th class="Q">Accountnamen<br>Channel</th>');
-        }
-        else
-          return;
 
         $('table tbody tr').each(function(index) {
             const row = $(this);
@@ -1185,6 +1179,11 @@ class BaseVariables
                     method: 'GET',
                     url: 'https://www6.knuddels.de:8443/ac/' + link,
                     onload: function(response) {
+                         const headerRow = $('table tr').first();
+                         if (headerRow.length && !headerRow.find('th:contains("Accountnamen")').length) {
+                             headerRow.append('<th class="Q">Accountnamen<br>Channel</th>');
+                         }
+
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(response.responseText, 'text/html');
 
@@ -1219,7 +1218,7 @@ class BaseVariables
                         const backgroundColor = (index % 2 === 0) ? '#DDDDDD' : '#EEEEEE';
 
                         if (!row.find('td.nicknamen-column').length) {
-                            row.append('<td class="Q"><span style="color: #060; font-weight: bold;">' + (meldender || 'Unbekannt') + '</span><br><span style="color: #900; font-weight: bold;">' + (gemeldeter || 'Unbekannt') + '</span><br><b>Channel: </b>' +  channel + '</td>');
+                            row.append('<td class="nicknamen-column Q"><span style="color: #060; font-weight: bold;">' + (meldender || 'Unbekannt') + '</span><br><span style="color: #900; font-weight: bold;">' + (gemeldeter || 'Unbekannt') + '</span><br><b>Channel: </b>' +  channel + '</td>');
                         }
                     }
                 });
