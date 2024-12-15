@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.7.3
+// @version      2.7.5
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // @require https://code.jquery.com/jquery-3.3.1.min.js
 // @require https://code.jquery.com/ui/1.12.1/jquery-ui.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
@@ -142,7 +142,7 @@ class BaseVariables
        $('#content').parent().parent().html($('#content').parent().parent().html() + `
         <div class="config">
 					<div class="config-content">
-						<div class="configContent">⚙️
+						<div class="configContent" style="max-width: 800px;">⚙️
               <center><h2>Einstellungen verwalten</h2></center>
               <ul id="tabs">
                 <li>
@@ -1162,6 +1162,61 @@ class BaseVariables
       addTextFilter();
 
 
+
+      if (window.location.href.includes("ac_overview.pl") || window.location.href.includes("ac_search.pl")) {
+        const headerRow = $('table tr').first();
+        if (headerRow.length && !headerRow.find('th:contains("Accountnamen")').length) {
+            headerRow.append('<th class="Q">Accountnamen</th>');
+        }
+
+        $('table tbody tr').each(function(index) {
+            const row = $(this);
+            const link = row.find('a.blind').attr('href');
+
+            if (link) {
+                const caseId = link.match(/id=(\d+)/)[1];
+
+                GM_xmlhttpRequest({
+                    method: 'GET',
+                    url: 'https://www6.knuddels.de:8443/ac/' + link,
+                    onload: function(response) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response.responseText, 'text/html');
+
+                        let meldender = '';
+                        let gemeldeter = '';
+
+                        const meldenderAlt = doc.querySelector('h3 div[style*="float:left"] span[style*="color: #060"]');
+                        const gemeldeterAlt = doc.querySelector('h3 div[style*="float:left"] span[style*="color: #900"]');
+
+                        if (meldenderAlt && gemeldeterAlt) {
+                            meldender = meldenderAlt.textContent.trim();
+                            gemeldeter = gemeldeterAlt.textContent.trim();
+                        }
+
+                        if (!meldender || !gemeldeter) {
+                            const contentText = doc.body.textContent;
+                            const meldenderMatch = contentText.match(/Meldende\(r\):\s*([^\n]+)/);
+                            const gemeldeterMatch = contentText.match(/Gemeldete\(r\):\s*([^\n]+)/);
+
+                            if (meldenderMatch) {
+                                meldender = meldenderMatch[1].trim();
+                            }
+                            if (gemeldeterMatch) {
+                                gemeldeter = gemeldeterMatch[1].trim();
+                            }
+                        }
+
+                        const backgroundColor = (index % 2 === 0) ? '#DDDDDD' : '#EEEEEE';
+
+                        if (!row.find('td.nicknamen-column').length) {
+                            row.append('<td class="Q"><span style="color: #060; font-weight: bold;">' + (meldender || 'Unbekannt') + '</span><br><span style="color: #900; font-weight: bold;">' + (gemeldeter || 'Unbekannt') + '</span></td>');
+                        }
+                    }
+                });
+            }
+        });
+      }
     }
 
     function showReportLink()
@@ -1195,9 +1250,11 @@ class BaseVariables
           });
         });
 
-        showInputs();
-
-
+        try
+        {
+          showInputs();
+        }
+        catch {}
       }
     }
 
