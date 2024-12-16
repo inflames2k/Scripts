@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.8.4
+// @version      2.8.5
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1247,10 +1247,9 @@ class BaseVariables
         $('.content-type-section').each(function() {
           var item = $(this);
 
-          $(this).children('p:contains("Profil-")').each(function() {
-             $(this).addClass("profileSection");
-              $(this).html($(this).html().replaceAll('Profil-', ''));
-
+          $(this).children('p:contains("Profil-"):not(p:contains("Profil-Foto"))').each(function() {
+            $(this).addClass("profileSection");
+            $(this).html($(this).html().replaceAll('Profil-', ''));
           });
 
           item.children('.profileSection').wrapAll('<div class="profileSection"></div>');
