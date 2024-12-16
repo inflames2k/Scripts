@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.9
+// @version      2.9.1
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1460,12 +1460,14 @@ class BaseVariables
         case "Light":
           $('html,#main,.modal-content,.config-content,section, li label').css('background-color', 'white');
           $('html').css('filter', 'invert(0%) hue-rotate(0deg)');
+          $('.hilite').css("filter", "hue-rotate(0deg)");
           $('#header,#navi,.modern-button,.loginDetail,img').css('filter', 'invert(0%) hue-rotate(0deg)');
           break;
         case "Dark":
           $('html,#main,.modal-content,.config-content,section,.config-content, li label').css('background-color', 'lightgray');
           $('html').css('filter', 'invert(100%) hue-rotate(180deg)');
-          $('#header,#navi,.modern-button,.loginDetail,img').css('filter', 'invert(180%) hue-rotate(180deg)');
+          $('#header,#navi,.modern-button,.loginDetail,img').css('filter', 'invert(260%) hue-rotate(180deg)');
+          $('.hilite').css("filter", "hue-rotate(295deg)");
           break;
       }
 
