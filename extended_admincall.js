@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.8.5
+// @version      2.9
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -69,6 +69,7 @@ class Settings
      this.enableReportOverlay = localStorage.getItem("enableReportOverlay") ?? "ja";
      this.enableAutoRefresh = localStorage.getItem("enableAutoRefresh") ?? "nein";
      this.enableActionFilter = localStorage.getItem("enableActionFilter") ?? "ja";
+     this.enableGuiltyFilter = localStorage.getItem("enableGuiltyFilter") ?? "nein";
      this.warnTextCollection = WarnTextCollection.load();
    }
 
@@ -81,6 +82,7 @@ class Settings
      localStorage.setItem("enableReportOverlay", this.enableReportOverlay);
      localStorage.setItem("enableAutoRefresh", this.enableAutoRefresh);
      localStorage.setItem("enableActionFilter", this.enableActionFilter);
+     localStorage.setItem("enableGuiltyFilter", this.enableGuiltyFilter);
      this.warnTextCollection.save();
    }
 }
@@ -132,6 +134,8 @@ class BaseVariables
         $('#expandReportContent').val(baseVariables.settings.expandReportContents);
         expandReportContents();
 
+        $('#enableGuiltyFilter').val(baseVariables.settings.enableGuiltyFilter);
+        filterGuilty();
         $('#refreshInterval').val(baseVariables.settings.overViewRefreshInterval / 1000);
 
         modifyLog();
@@ -204,6 +208,11 @@ class BaseVariables
                           <td style="width: 0px"></td>
                           <td>▼ Maßnahmen filtern:</td>
                           <td><select id="enableActionFilter" name="actionFilter" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die Filterung der Maßnahmen nach Meldetypen.</span></td>
+                        </tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td>▼ Bisherige Meldungen filtern:</td>
+                          <td><select id="enableGuiltyFilter" name="guiltyFilter" style="width: 100px"><option value="ja">Ja</option><option value="nein">Nein</option></select><br><br><span style="font-size: 12px; padding-top: 5px">Aktiviert die Filterung der angezeigten Meldungen des beschuldigten auf Meldungen in denen er schuldig war.</span></td>
                         </tr>
                       </table>
                     </div>
@@ -330,6 +339,13 @@ class BaseVariables
           expandReportContents();
         });
 
+        $('#enableGuiltyFilter').change(function() {
+          baseVariables.settings.enableGuiltyFilter = $(this).val();
+          baseVariables.settings.save();
+
+          filterGuilty();
+        });
+
         $('#refreshInterval').change(function() {
           var value = $(this).val();
 
@@ -395,6 +411,17 @@ class BaseVariables
         $('.close').on("click", function() {
 			    closeModal();
         });
+    }
+
+    // filters history reports for guilty reports
+    function filterGuilty()
+    {
+      if(/ac_viewcase.pl/.test(window.location.href))
+      {
+        if((!$('input[onclick="toggleVisibilityOfUnguiltyCases(this)"]').is(':checked') && baseVariables.settings.enableGuiltyFilter =="ja")
+          || $('input[onclick="toggleVisibilityOfUnguiltyCases(this)"]').is(':checked'))
+          $('input[onclick="toggleVisibilityOfUnguiltyCases(this)"]')?.click();
+      }
     }
 
     // set a given warning editable
@@ -592,7 +619,6 @@ class BaseVariables
 
             $('#navi').html('<span id="reportRequest" style="display: none;"><a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | </span>' + $('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
 
-            //$("#navi").html($("#navi").html().replace("Statistik", "📈 Statistik").replace("Übersicht", "🧮 Übersicht").replace("Meine Meldungen", "🚩 Meine Meldungen").replace("Suche", "🔍 Suche"));
         }
     }
 
@@ -1178,8 +1204,16 @@ class BaseVariables
         });
 
         if(/ac_start.pl/.test(window.location.href))
+        {
             $('b:contains("Deine letzten Meldungen:")').prev().nextUntil('hr').wrapAll('<div class="memberWrapper"></div>');
+            $('b:contains("Du hast momentan keine offene Meldung.")').nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper"></div>');
+        }
+        else if(/ac_viewcase.pl/.test(window.location.href) || /ac_overview.pl/.test(window.location.href))
+            $('h3').first().nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper reportInfo"></div>');
 
+
+        $('.reportInfo').before('<br>');
+        $('.reportInfo').after('<br>');
 
         $('hr:not(:first)').replaceWith('<br>');
         $('hr:first').replaceWith('');
