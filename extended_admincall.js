@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.8.3
+// @version      2.8.4
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1244,15 +1244,19 @@ class BaseVariables
     {
       if(/ac_viewcase.pl/.test(window.location.href))
       {
-        var index = 0;
-        $('.content-type-section p:contains("Profil-")').each(function() {
-          $(this).addClass("profileSection");
-        //  alert($(this).children().first().children().first().html());
-          $(this).html($(this).html().replaceAll('Profil-', ''));
+        $('.content-type-section').each(function() {
+          var item = $(this);
+
+          $(this).children('p:contains("Profil-")').each(function() {
+             $(this).addClass("profileSection");
+              $(this).html($(this).html().replaceAll('Profil-', ''));
+
+          });
+
+          item.children('.profileSection').wrapAll('<div class="profileSection"></div>');
+          item.children('.profileSection').html('<br><h4>Profilinhalte</h4>' + item.children('.profileSection').html() + '<br>');
         });
 
-        $('.profileSection').wrapAll('<div class="profileSection"></div>');
-        $('.profileSection').html('<br><h4>Profilinhalte</h4>' + $('.profileSection').html() + '<br>');
 
         $('.content-type-section h4').css("max-width", "98%");
       }
