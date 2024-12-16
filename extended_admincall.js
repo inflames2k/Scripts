@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.9.1
+// @version      2.9.2
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1214,6 +1214,9 @@ class BaseVariables
 
         $('.reportInfo').before('<br>');
         $('.reportInfo').after('<br>');
+
+        $('.reportInfo').children('div[style="width:460px; float:left;"]').css("padding-left", "10px");
+
 
         $('hr:not(:first)').replaceWith('<br>');
         $('hr:first').replaceWith('');
