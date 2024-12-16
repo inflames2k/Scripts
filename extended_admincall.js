@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.8.2
+// @version      2.8.3
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1236,6 +1236,26 @@ class BaseVariables
       setReportLinks();
       addTextFilter();
       addReportNames();
+
+      splitReportContents();
+    }
+
+    function splitReportContents()
+    {
+      if(/ac_viewcase.pl/.test(window.location.href))
+      {
+        var index = 0;
+        $('.content-type-section p:contains("Profil-")').each(function() {
+          $(this).addClass("profileSection");
+        //  alert($(this).children().first().children().first().html());
+          $(this).html($(this).html().replaceAll('Profil-', ''));
+        });
+
+        $('.profileSection').wrapAll('<div class="profileSection"></div>');
+        $('.profileSection').html('<br><h4>Profilinhalte</h4>' + $('.profileSection').html() + '<br>');
+
+        $('.content-type-section h4').css("max-width", "98%");
+      }
     }
 
     function addReportNames()
@@ -1490,6 +1510,10 @@ class BaseVariables
 			.content-type-section h4 {
 			 background-color: #F7F8E0 !important;
 			}
+
+      .content-type-section h4 {
+       background-color: lightgray !important;
+      }
 
 			#footer
 			{
