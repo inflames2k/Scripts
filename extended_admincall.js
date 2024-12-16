@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
-// @version      2.9.2
+// @version      2.9.3
 // @author       riesaboy
 // @match        https://*.knuddels.de:8443/ac/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
@@ -1206,17 +1206,21 @@ class BaseVariables
         if(/ac_start.pl/.test(window.location.href))
         {
             $('b:contains("Deine letzten Meldungen:")').prev().nextUntil('hr').wrapAll('<div class="memberWrapper"></div>');
-            $('b:contains("Du hast momentan keine offene Meldung.")').nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper"></div>');
+
+            if(!$('b:contains("Du hast momentan keine offene Meldung.")').parent().hasClass('memberWrapper'))
+              $('b:contains("Du hast momentan keine offene Meldung.")').nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper"></div>');
         }
         else if(/ac_viewcase.pl/.test(window.location.href) || /ac_overview.pl/.test(window.location.href))
-            $('h3').first().nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper reportInfo"></div>');
+        {
+            if(!$('h3').first().parent().hasClass('reportInfo'))
+            {
+              $('h3').first().nextUntil('.memberWrapper').prev().wrapAll('<div class="memberWrapper reportInfo"></div>');
 
-
-        $('.reportInfo').before('<br>');
-        $('.reportInfo').after('<br>');
-
-        $('.reportInfo').children('div[style="width:460px; float:left;"]').css("padding-left", "10px");
-
+              $('.reportInfo').before('<br>');
+              $('.reportInfo').after('<br>');
+              $('.reportInfo').children('div[style="width:460px; float:left;"]').css("padding-left", "10px");
+            }
+        }
 
         $('hr:not(:first)').replaceWith('<br>');
         $('hr:first').replaceWith('');
