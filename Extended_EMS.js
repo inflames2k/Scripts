@@ -8,7 +8,7 @@
 // @require https://code.jquery.com/jquery-3.3.1.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
-// @version     0.1
+// @version     0.2
 // @author      riesaboy
 // @description Script to modify EMS entries
 // ==/UserScript==
@@ -46,7 +46,7 @@
      table.addClass("reportTable");
      table.css("max-width", '1000px');
 
-     let regex = XRegExp('<div style="width:460px; float:left;{0,1}"><span style="font-weight:bold[^.]{0,100}">([^<]{2,})<\/span>(.{1,334}|.{1,426})(\\d+) Jahre,.{1,26}([^\\s]+)([.]| ([^\\s]+)),.([^\\s]+) Minuten \\(Reg\\.: ([^\\)]+)\\),.{1,25}([^\\s]+).{1,300}involvedemail=(.*?)&emailtype=', 'gms');
+     let regex = XRegExp('<div style="width:460px; float:left;{0,1}"><span style="font-weight:bold[^.]{0,100}">([^<]{2,})<\/span>(.{1,334}|.{1,426})(\\d+) Jahre,.{1,26}([^\\s]+)([.]| ([^\\s]+)),.([^\\s]+) Minuten \\(Reg\\.: ([^\\)]+)\\),.{1,25}([^\\s]+).{1,300}involvedemail=(.*?)&emailtype=[^\\s]{0,100}<\/a> \\((.*?)\\)', 'gms');
 
      const params = new URLSearchParams(window.location.search);
      var email = $('#involvedemail').val();
@@ -88,8 +88,11 @@
 
                 var m;
                 while ((m = regex.exec(res.responseText)) !== null) {
-                  if(m[10] == email || m[1].toLowerCase() == replaceUmlaute(nick).toLowerCase())
+                      console.log(m[11]);
+                      console.log(email);
+                  if(m[10].toLowerCase() == email.toLowerCase() || m[11].toLowerCase() ==email.replace('@', '&#64;').toLowerCase() || m[1].toLowerCase() == replaceUmlaute(nick).toLowerCase())
                   {
+                    console.log(m[11]);
                     var reportNick = m[1];
                     var gender;
                     if(m[5] !== ".")
