@@ -8,7 +8,7 @@
 // @require https://code.jquery.com/jquery-3.3.1.min.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
-// @version     0.2
+// @version     0.3
 // @author      riesaboy
 // @description Script to modify EMS entries
 // ==/UserScript==
@@ -16,121 +16,185 @@
 (function() {
     'use strict';
 
-      const umlautMap = {
-        '\u00dc': '&Uuml;',
-        '\u00c4': '&Auml;',
-        '\u00d6': '&Ouml;',
-        '\u00fc': '&uuml;',
-        '\u00e4': '&auml;',
-        '\u00f6': '&Ouml;',
-        '\u00df': '&szlig;',
+    // const default data
+    const email = $('#involvedemail').val();
+    const nick = $('#involvednick').val();
+
+    const umlautMap = {
+      '\u00dc': '&Uuml;',
+      '\u00c4': '&Auml;',
+      '\u00d6': '&Ouml;',
+      '\u00fc': '&uuml;',
+      '\u00e4': '&auml;',
+      '\u00f6': '&Ouml;',
+      '\u00df': '&szlig;',
+    }
+
+
+    // startup calls
+    modifyTable();
+    executeParsing();
+
+    // functions
+    function replaceUmlaute(str) {
+      if(str)
+      {
+        return str
+              .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+                const big = umlautMap[a.slice(0, 1)];
+                return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+              })
+              .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+                (a) => umlautMap[a]
+              );
       }
+      else return "";
+    }
 
-      function replaceUmlaute(str) {
-        if(str)
-        {
-          return str
-            .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
-              const big = umlautMap[a.slice(0, 1)];
-              return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
-            })
-            .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
-              (a) => umlautMap[a]
-            );
-        }
-        else return "";
+    // function to get header rows
+    function addHeaderRows()
+    {
+      const headerRow = $('.reportTable tr').first();
+      if (headerRow.length && !headerRow.find('th:contains("Nick")').length) {
+        headerRow.append('<th class="Q">Nick</th>');
       }
+      if (headerRow.length && !headerRow.find('th:contains("Gender")').length) {
+        headerRow.append('<th class="Q">Gender<br>Age</th>');
+      }
+      if (headerRow.length && !headerRow.find('th:contains("Minuten")').length) {
+        headerRow.append('<th class="Q">Minuten<br>Status / Reg</th>');
+      }
+    }
 
-     // get required table
-     var table = $('h3:contains("Suchergebnis")').next();
-     table.addClass("reportTable");
-     table.css("max-width", '1000px');
+    // function to modify table
+    function modifyTable()
+    {
+      var table = $('h3:contains("Suchergebnis")').next();
+      table.addClass("reportTable");
+      table.css("max-width", '1000px');
 
-     let regex = XRegExp('<div style="width:460px; float:left;{0,1}"><span style="font-weight:bold[^.]{0,100}">([^<]{2,})<\/span>(.{1,334}|.{1,426})(\\d+) Jahre,.{1,26}([^\\s]+)([.]| ([^\\s]+)),.([^\\s]+) Minuten \\(Reg\\.: ([^\\)]+)\\),.{1,25}([^\\s]+).{1,300}involvedemail=(.*?)&emailtype=[^\\s]{0,100}<\/a> \\((.*?)\\)', 'gms');
+      addHeaderRows();
+    }
 
-     const params = new URLSearchParams(window.location.search);
-     var email = $('#involvedemail').val();
-     var nick = $('#involvednick').val();
-     //var searchType = $('#involvementtype').val();
+    // function to execute parsing
+    function executeParsing()
+    {
+      if((email || nick) && (nick.split(',').length <= 1))
+      {
+        // iterate through rows and fill data
+        $('.reportTable tbody tr:not(:first)').each(function(index) {
+          var row = $(this);
+          var reportLink = $(this).find('a.blind').attr("href");
 
-     if((email || nick) && (nick.split(',').length <= 1))
-     {
-         // iterate through rows and fill data
-         $('.reportTable tbody tr:not(:first)').each(function(index) {
-           var row = $(this);
-           var reportLink = $(this).find('a.blind').attr("href");
+          if(reportLink)
+          {
+            var reportId = reportLink.match(/id=(\d+)/)[1];
 
-           if(reportLink)
-           {
-             var reportId = reportLink.match(/id=(\d+)/)[1];
-             var columnIndex = -1;
+            row.append('<td class="Q nick' + index + '"></td>');
+            row.append('<td class="Q gender' + index + '"></td>');
+            row.append('<td class="Q minutes' + index + '"></td>');
 
-             row.append('<td class="Q nick' + index + '"></td>');
-             row.append('<td class="Q gender' + index + '"></td>');
-             row.append('<td class="Q minutes' + index + '"></td>');
-             //row.append('<td style="width: 98px;" class="Q status' + index + '"></td>');
-             // get data from row url
-             GM_xmlhttpRequest({
+            // get data from row url
+            GM_xmlhttpRequest({
               method: 'GET',
               url: reportLink,
               onload: function(res)
               {
-                const headerRow = $('.reportTable tr').first();
-                if (headerRow.length && !headerRow.find('th:contains("Nick")').length) {
-                    headerRow.append('<th class="Q">Nick</th>');
-                }
-                if (headerRow.length && !headerRow.find('th:contains("Gender")').length) {
-                    headerRow.append('<th class="Q">Gender<br>Age</th>');
-                }
-                if (headerRow.length && !headerRow.find('th:contains("Minuten")').length) {
-                    headerRow.append('<th class="Q">Minuten<br>Status / Reg</th>');
-                }
-
-                var m;
-                while ((m = regex.exec(res.responseText)) !== null) {
-                      console.log(m[11]);
-                      console.log(email);
-                  if(m[10].toLowerCase() == email.toLowerCase() || m[11].toLowerCase() ==email.replace('@', '&#64;').toLowerCase() || m[1].toLowerCase() == replaceUmlaute(nick).toLowerCase())
-                  {
-                    console.log(m[11]);
-                    var reportNick = m[1];
-                    var gender;
-                    if(m[5] !== ".")
-                    {
-                      var sub = m[5][0] == 'E' ? 'm' : 'w';
-                      gender = m[4][0]+'('+sub+')' +m[3];
-                    }
-                    else
-                      gender = m[4][0]+ m[3];
-
-                    var status = m[9];
-                    var minutes = m[7];
-                    var regTime = m[8];
-
-                    switch(status)
-                    {
-                      case "Familymitglied,":
-                        reportNick = '<span style="color: #0080FF"><b>' + reportNick + '</b></span>';
-                        break;
-                      case "Stammi,":
-                      case "Ehrenmitglied,":
-                        reportNick = '<span style="color: #01DF01"><b>' + reportNick + '</b></span>';
-                        break;
-                      case "Admin,":
-                        reportNick = '<span style="color: #FE2E2E"><b>' + reportNick + '</b></span>';
-                        break;
-                    }
-
-                   // var gender = m[5] !== "." ? m[4][0]+'('+m[5][0] == 'E' ? 'm' : 'w'+')'+m[3] : m[4][0]+m[3];
-                    $('.nick' + index).html(reportNick);
-                    $('.minutes' + index).html(minutes + ' Min.<br>' + status + '<br>' + regTime);
-                    $('.gender' + index).html(gender);
-                  //  $('.status' + index).html(m[9] + '<br>' + m[8] + '');
-                  }
-                }
+                parseData($($.parseHTML(res.responseText)), index);
               }
-             });
-           }
+            });
+          }
         });
-     }
+      }
+    }
+
+    // function to parse the data
+    function parseData(data, index)
+    {
+      wrapMemberContainers(data);
+
+      var container;
+      var entryNick;
+      var entryMail;
+      var entryMailFound;
+      $(data).find('.memberDiv').each(function()
+      {
+        if(!container)
+        {
+            entryNick = $(this).find('span[style*="color: #060"],span[style*="color: #900"]').text();
+            entryMail = $(this).find('a[href*="involvedemail"]').html();
+            //entryMailUnhashed = $(this).find('a[href*="involvedemail"]').parent();
+            entryMailFound = $(this).find('a[href*="involvedemail"]').parent().text().toLowerCase().indexOf('(' + email + ')') >= 0;
+
+            if((email && (entryMail && entryMail.toLowerCase() === email.toLowerCase()
+               || entryMailFound))
+               || (nick && replaceUmlaute(nick).toLowerCase().trim() === entryNick.toLowerCase().trim()))
+            {
+              container = $(this);
+
+              // remove all unrelevant data
+              $(this).find('div:contains("Info:"):last()').next().children().each(function() {
+                $(this).remove();
+              });
+
+              // get userinfo
+              var userInfo = $(this).find('div:contains("Info:"):last()').next().text().trim().split(',');
+
+
+              // parse userinfo
+              var age = userInfo[0].substring(0, userInfo[0].indexOf('Jahre') - 1);
+              var gender = userInfo[1].trim();
+              var minutes = userInfo[2].trim().substring(0, userInfo[2].trim().indexOf('Minuten') -1);;
+              var reg = userInfo[2].trim().substring(userInfo[2].trim().indexOf(': ') + 2, 50) + ' ' + userInfo[3].trim().substring(0, userInfo[3].trim().indexOf(')'));
+              var status = userInfo[4].trim();
+
+              showData({
+                nick: entryNick,
+                age: age,
+                gender: gender,
+                reg: reg,
+                status: status,
+                minutes: minutes
+              }, index);
+            }
+        }
+      });
+    }
+
+    // function to show data
+    function showData(userInfo, index)
+    {
+      $('.nick' + index).html('<span style="color: ' + getStatusColor(userInfo.status) + '"><b>' + userInfo.nick + '</b></span>');
+      $('.minutes' + index).html(userInfo.minutes + ' Min.<br>' + userInfo.status + '<br>' + userInfo.reg);
+      $('.gender' + index).html('<center>' + userInfo.gender + '<br>' + userInfo.age + '</center>');
+    }
+
+    // function to get status color
+    function getStatusColor(status)
+    {
+      var color = '#000000';
+      switch(status)
+      {
+        case "Familymitglied":
+          color = '#0080FF';
+          break;
+        case "Stammi":
+        case "Ehrenmitglied":
+          color = '#01DF01';
+          break;
+        case "Admin":
+          color = '#FE2E2E';
+        break;
+      }
+
+      return color;
+    }
+
+    // function to wrap the member containers
+    function wrapMemberContainers(data)
+    {
+      $(data).find('hr').each(function() {
+        $(this).nextUntil('hr').wrapAll('<div class="memberDiv"></div>');
+      });
+    }
 })();
