@@ -6,11 +6,10 @@
 // @grant       GM_xmlhttpRequest
 // @match        https://*.knuddels.de:8443/ac/ac_search.pl*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
-// @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
-// @version     0.3
+// @version     0.5
 // @author      riesaboy
 // @description Script to modify EMS entries
+// @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
 // ==/UserScript==
 
 (function() {
@@ -30,57 +29,15 @@
       '\u00df': '&szlig;',
     }
 
-
-    // startup calls
-    modifyTable();
     executeParsing();
-
-    // functions
-    function replaceUmlaute(str) {
-      if(str)
-      {
-        return str
-              .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
-                const big = umlautMap[a.slice(0, 1)];
-                return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
-              })
-              .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
-                (a) => umlautMap[a]
-              );
-      }
-      else return "";
-    }
-
-    // function to get header rows
-    function addHeaderRows()
-    {
-      const headerRow = $('.reportTable tr').first();
-      if (headerRow.length && !headerRow.find('th:contains("Nick")').length) {
-        headerRow.append('<th class="Q">Nick</th>');
-      }
-      if (headerRow.length && !headerRow.find('th:contains("Gender")').length) {
-        headerRow.append('<th class="Q">Gender<br>Age</th>');
-      }
-      if (headerRow.length && !headerRow.find('th:contains("Minuten")').length) {
-        headerRow.append('<th class="Q">Minuten<br>Status / Reg</th>');
-      }
-    }
-
-    // function to modify table
-    function modifyTable()
-    {
-      var table = $('h3:contains("Suchergebnis")').next();
-      table.addClass("reportTable");
-      table.css("max-width", '1000px');
-
-      addHeaderRows();
-    }
 
     // function to execute parsing
     function executeParsing()
     {
       if((email || nick) && (nick.split(',').length <= 1))
       {
+        // startup calls
+        modifyTable();
         // iterate through rows and fill data
         $('.reportTable tbody tr:not(:first)').each(function(index) {
           var row = $(this);
@@ -196,5 +153,46 @@
       $(data).find('hr').each(function() {
         $(this).nextUntil('hr').wrapAll('<div class="memberDiv"></div>');
       });
+    }
+
+    // functions
+    function replaceUmlaute(str) {
+      if(str)
+      {
+        return str
+              .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+                const big = umlautMap[a.slice(0, 1)];
+                return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+              })
+              .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+                (a) => umlautMap[a]
+              );
+      }
+      else return "";
+    }
+
+    // function to get header rows
+    function addHeaderRows()
+    {
+      const headerRow = $('.reportTable tr').first();
+      if (headerRow.length && !headerRow.find('th:contains("Nick")').length) {
+        headerRow.append('<th class="Q">Nick</th>');
+      }
+      if (headerRow.length && !headerRow.find('th:contains("Gender")').length) {
+        headerRow.append('<th class="Q">Gender<br>Age</th>');
+      }
+      if (headerRow.length && !headerRow.find('th:contains("Minuten")').length) {
+        headerRow.append('<th class="Q">Minuten<br>Status / Reg</th>');
+      }
+    }
+
+    // function to modify table
+    function modifyTable()
+    {
+      var table = $('h3:contains("Suchergebnis")').next();
+      table.addClass("reportTable");
+      table.css("max-width", '1000px');
+
+      addHeaderRows();
     }
 })();
