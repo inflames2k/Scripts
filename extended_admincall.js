@@ -6,7 +6,6 @@
 // @grant       GM_xmlhttpRequest
 // @match        https://*.knuddels.de:8443/ac/ac_search.pl*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
 // @version     0.4
 // @author      riesaboy
