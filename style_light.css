@@ -27,7 +27,7 @@ html
 }
 
 .hilite {
-  background-color: #F3E2A9;
+  background-color: #F3E2A9 !important;
 }
 
 .bsf {
