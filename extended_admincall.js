@@ -1447,7 +1447,7 @@ class BaseVariables
           break;
         case "Dark":
           setStyleDark();
-          $('input[type="text"],input[type="password"],input[type="number"],select').css('filter', 'invert(100%)');
+          $('input[type="text"],input[type="password"],input[type="number"],input[type="checkbox"],select').css('filter', 'invert(100%)');
           break;
       }
 
