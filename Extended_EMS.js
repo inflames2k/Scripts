@@ -6,7 +6,7 @@
 // @grant       GM_xmlhttpRequest
 // @match        https://*.knuddels.de:8443/ac/ac_search.pl*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
-// @version     0.5
+// @version     0.6
 // @author      riesaboy
 // @description Script to modify EMS entries
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
@@ -129,7 +129,7 @@
     // function to get status color
     function getStatusColor(status)
     {
-      var color = '#000000';
+      var color = $('html').css("color");
       switch(status)
       {
         case "Familymitglied":
