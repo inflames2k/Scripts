@@ -1,10 +1,23 @@
-html 
+html
 {
-  background-color: white; 
+  background-color: white;
+}
+
+.translate:not(.translateActive):hover {
+  filter: hue-rotate(180deg);
+  cursor: pointer;
+}
+
+.translateActive {
+  filter: grascale(1);
+}
+
+.bsf {
+  background-color: #A9F5E1 !important;
 }
 
 .caseinfo2 {
-	background-color: #F7F8E0 !important;
+	background-color: #F2F2F2 !important;
   margin-left: -5px;
 }
 
@@ -30,9 +43,7 @@ html
   background-color: #F3E2A9 !important;
 }
 
-.bsf {
-  background-color: #CEF6CE;
-}
+
 
       .memberWrapper:hover, .loginForm:hover {
         border: 1px solid rgb(175, 142, 232) !important;
