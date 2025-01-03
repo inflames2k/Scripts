@@ -1,7 +1,6 @@
 html
 {
   background-color: white;
-  display: none;
 }
 
 .translate:not(.translateActive):hover {
