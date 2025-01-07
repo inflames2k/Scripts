@@ -6,7 +6,7 @@
 // @grant       GM_xmlhttpRequest
 // @match        https://*.knuddels.de:8443/ac/ac_search.pl*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
-// @version     0.6
+// @version     0.7
 // @author      riesaboy
 // @description Script to modify EMS entries
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Extended_EMS.js
@@ -85,7 +85,7 @@
 
             if((email && (entryMail && entryMail.toLowerCase() === email.toLowerCase()
                || entryMailFound))
-               || (nick && replaceUmlaute(nick).toLowerCase().trim() === entryNick.toLowerCase().trim()))
+               || (nick && nick.toLowerCase().trim() === entryNick.toLowerCase().trim()))
             {
               container = $(this);
 
