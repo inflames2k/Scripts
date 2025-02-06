@@ -358,6 +358,10 @@ html
               overflow-x: hidden;
             }
 
+            .config-content {
+		height: 100%;
+	    }
+
             details {
               font-size: 15px;
             }
