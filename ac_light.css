@@ -354,7 +354,7 @@ html
 
             .configContent, .reportContent {
               height: 100px;
-              height: 750px;
+              height: 650px;
               overflow-x: hidden;
             }
 
