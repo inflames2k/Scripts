@@ -10,8 +10,8 @@
 // @require https://code.jquery.com/ui/1.12.1/jquery-ui.js
 // @require https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js
 // @downloadURL https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/extended_admincall.js
-// @resource      styleDark https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/ac_dark.css
-// @resource      styleLight https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/ac_light.css
+// @resource      styleDark https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/ac_dark.css?20250201
+// @resource      styleLight https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/ac_light.css?20250201
 // @grant         GM_getResourceText
 // ==/UserScript==
 
