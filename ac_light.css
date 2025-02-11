@@ -348,13 +348,13 @@ html
 	      padding: 20px;
               border: 1px solid #888;
               width: 800px;
-              height: 820px;
+              height: 700px;
               border-radius: 10px;
             }
 
             .configContent, .reportContent {
               height: 100px;
-              height: 650px;
+              height: 750px;
               overflow-x: hidden;
             }
 
