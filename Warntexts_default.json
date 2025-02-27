@@ -47,7 +47,7 @@
         {
             "title": "Messengerwerbung (Readme)",
             "text": "Hallo {user},#ich habe soeben deine Readme entfernt.#Der öffentliche Verweis auf andere Kommunikations- und Messenger Plattformen, die nicht Teil der Knuddels-Dienste sind, ist nicht gestattet. [AGB Punkt 5.6].#Bitte achte künftig darauf, wenn du wieder eine Readme setzen solltest.#Im Rahmen dessen kann die erneute Nennung anderer Kommunikations- und Messenger Plattformen in der Readme künftig zu Nicksperren führen.#Für Rückfragen stehe ich dir gerne zur Verfügung.##Knuddelige Grüße",
-            "comment": "BS fällt hier durch Werbung für Fremdmessenger im Readme auf. 1. Verstoß daher hier verwarnt.",
+            "comment": "BS fällt hier durch Werbung für Fremdmessenger im Readme auf. 1. Verstoß daher hier verwarnt und Readme entfernt.",
             "id": "548e8ce7-5037-4b64-979e-971b61d00937"
         },
         {
@@ -59,9 +59,9 @@
     ],
     "profilePictureWarns": [
         {
-            "title": "Schlechte Qualität / Nicht erkennbar / Nickbesitzer nicht abgebildet",
-            "text": "Hinweisnachricht des Profil-Teams§Hallo,##du hast leider erneut ein Foto hochgeladen, welches mit unseren °>/h Fotoregeln<° nicht übereinstimmt. Diese Nachricht dient als ausdrücklicher Hinweis. Bitte halte dich künftig an die Fotoregeln und lade nur Bilder hoch, auf denen du gut zu erkennen bzw. selbst abgebildet bist.##Solltest du Probleme damit haben, einschätzen zu können, welches Bild unseren Fotoregeln entspricht, kannst du dich auch gerne jederzeit an ein Mitglied des Profil-Teams wenden. Solltest du einen direkten Ansprechpartner des Teams suchen, kannst du im Chat _/team Profil_ eingeben. Dort findest du Teammitglieder, welche aktuell online sind.##Für Rückfragen stehe ich dir gerne zur Verfügung.#Ich bitte dich, meine Hinweisnachricht entsprechend zu beherzigen, denn das Profilfoto sollte ja schließlich dazu dienen zu erkennen, mit wem man eigentlich spricht.#Liebe Grüße",
-            "comment": "[Bildbeschreibung]\r\n\r\nAls nicht [erkennbar/selbst] verschoben.\r\n3. Verstoß => VW + AI Eintrag",
+            "title": "3. Verstop nicht erkennbar / nicht selbst",
+            "text": "Hallo,##du hast leider erneut ein Foto hochgeladen, welches mit unseren °>/h Fotoregeln<° nicht übereinstimmt. Diese Nachricht dient als ausdrücklicher Hinweis. Bitte halte dich künftig an die Fotoregeln und lade nur Bilder hoch, auf denen du gut zu erkennen bzw. selbst abgebildet bist.##Solltest du Probleme damit haben, einschätzen zu können, welches Bild unseren Fotoregeln entspricht, kannst du dich auch gerne jederzeit an ein Mitglied des Profil-Teams wenden. Solltest du einen direkten Ansprechpartner des Teams suchen, kannst du im Chat _/team Profil_ eingeben. Dort findest du Teammitglieder, welche aktuell online sind.##Für Rückfragen stehe ich dir gerne zur Verfügung.#Ich bitte dich, meine Hinweisnachricht entsprechend zu beherzigen, denn das Profilfoto sollte ja schließlich dazu dienen zu erkennen, mit wem man eigentlich spricht.#Liebe Grüße",
+            "comment": "[Bildbeschreibung]\n\nAls nicht [erkennbar/selbst] verschoben.\n3. Verstoß => VW + AI Eintrag",
             "id": "7a94cde0-2930-41d3-ae48-0806abb93a29"
         }
     ]
