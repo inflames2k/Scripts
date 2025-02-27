@@ -1,27 +1,165 @@
 <div id="content">
-   <center><h2>Changelog - Extended Admincall Script</h2></center>
-   <b>26.02.2025: </b> V2.19.6 - Bei Auswahl einer Profilbild-Verwarnung wird automatisch auch der Haken bei Foto verschoben gewählt.<br><br>
-   <b>22.02.2025: </b> V2.19.5 - Diverse Fehlerkorrekturen und Anpassungen (z.B. Maßnahme durch andere Meldung ans Ende gestellt).<br><br> 
-   <b>19.02.2025: </b> V2.19 - Anpassungen nach letztem Update des Meldesystems. Filterung Weitergabe an MyChannel-Besitzer. Layoutanpassung neue Eingabemaske.<br><br>
-   <b>18.02.2025: </b> V2.18 - Anzeige Details (Melder, Gemeldeter, Channel) in Übersicht nun einstellbar. Außerdem Anzeige Statistik optimiert.<br><br>
-   <b>11.02.2025: </b> V2.17 - Korrektur Layout Einstellungsdialog im Lightmode. Layout DIalog für Verwarntexte angepasst (Inline-Button).<br><br>
-   <b>07.02.2025: </b> V2.16 - Provobutton hinzugefügt, mit Auswahl des Provousers.<br><br>
-   <b>24.01.2025: </b> V2.15 - Berechnung Bearbeitungsquote Meldungen angepasst, so dass dies für alle angezeigten Statistiken (CM, Teamler) korrekt berechnet wird.<br><br>
-   <b>09.01.2025: </b> V2.14 - Erkennung / Aufsplittung Profilinhalte angepasst. Es werden nun noch noch echte Profilinhalte als solche erkannt.<br><br>
-   <b>04.01.2025: </b> V2.13 - Schaltfläche für das Sperren von Paarnicks hinzugefügt. Schaltfläche ist nur aktiv, wenn die Registrierung ab dem Jahr 2024 stattgefunden hat.<br><br>
-   <b>27.12.2024: </b> V2.12 - Übersetzung von Chatnachrichten unter Verwendung der Free-API von deepl.com hinzugefügt.<br><br>
-   <b>21.12.2024: </b> V2.11 - Einstellungsdialog überarbeitet, neuer Reiter "Darstellung". Neue Einstellungen Nickhervorhebung Meldende(r) und Gemeldete(r) (Schriftfarbe).<br><br>
-   <b>20.12.2024: </b> v2.10 - DarkMode komplett überarbeitet, so dass nun alles durch Styles gelöst ist.<br><br>
-   <b>16.12.2024: </b> V2.9 - Box-Layout auf allen Seiten fertiggestellt, Profilinhalte abgetrennt von Chatinhalten, neue Einstellung "Bisherige Meldungen filtern" (Aktiviert automatisch die Checkbox das nur Fälle angezeigt werden, in denen der Beschuldigte schuldig war).<br><br>
-   <b>15.12.2024: </b> V2.8 - Weitere Einstellungen hinzugefügt (Automatisches Ausklappen Meldeinhalte, Aktivierung / Deaktivierung automatische Aktualisierung Übersicht, Filtern von Maßnahmen), Korrektur Einstellungsdialog für Anzeige auf "Suche".<br><br> 
-   <b>15.12.2024: </b> V2.7 - Einstellungsdialog hinzugefügt. Einstellbar: Layout, Anzeige Link "Meldung beantragen", Interval für Aktualisierung Meldungsübersicht. Zusätzlich Einstellbar: Verwarntexte (import, export, editieren, hinzufügen, entfernen). Default Datei für den Import kann <a href="https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Warntexts_default.json">hier</a> gefunden werden.<br><br>
-   <b>11.12.2024: </b> V2.5/v2.6 - Script dahingehend angepasst, dass nur noch das Bootstrap beim Client passiert und manuelle Erweiterung der Verwarntexte. / Aktivierungsschalter Meldung beantragen hinzugefügt<br><br>
-   <b>11.12.2024: </b> V2.4 - Bug bei Auswahl der Meldenummer zum Kopieren gefixt.<br><br>
-   <b>10.12.2024: </b> V2.3 - Changelog ergänzt.<br><br>
-   <b>06.12.2024: </b> V2.2 - Funktionalität zur Erkennung von Meldenummern und Verlinkung dieser ergänzt.<br><br>
-   <b>05.12.2024: </b> V2.1 - Dialog für Kopieren / Auswahl von Verwarntexten hinzugefügt und Umschaltung Light / Darkmodus hinzugefügt.<br><br>
-   <b>19.09.2024: </b> Ergänzt, das bei Verwendung der Schaltflächen Bot, Scammer und NAGB automatisch der Haken Filterrelevant gesetzt wird.<br><br>
-   <b>09.08.2024: </b> Layout Optimierungen<br><br>
-   <b>08.08.2024: </b> Vorschau für Meldungen bei Klick auf eine Tabellenzeile ergänzt.<br><br>
-   <b>06.08.2024: </b> Bearbeitungsquote für Meldungen zur Statistik hinzugefügt.
+	<center><h2>Changelog - Extended Admincall Script</h2></center>
+	<div>		
+		<b>27.02.2025:</b> V2.20
+		<ul style="margin-top: 0px">
+			<li>Neues Macro für Verwarnungen integriert - "/macro warn" statt "/m" mit Verwarnung</li>
+			<li>Einstellungsdialog Verwarnungen um Laden der Standard-Verwarntexte erweitert.</li>
+		</ul>
+	</div>
+	<hr>	
+	<div>		
+		<b>26.02.2025:</b> V2.19.6
+		<ul style="margin-top: 0px">
+			<li>Automatischer Haken "Profilbild (verschoben: ADU)" bei Profilbild Verwarnung</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>22.02.2025: </b> V2.19.5
+		<ul style="margin-top: 0px">
+			<li>Diverse Fehlerkorrekturen</li>
+			<li>"Maßnahme durch andere Meldung" ans Ende der Maßnahmenauswahl gestellt.</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>19.02.2025: </b> V2.19	
+		<ul style="margin-top: 0px">
+			<li>Anpassungen nach letztem Meldesystem-Update</li>
+			<li>Filterung "Weitergabe an MyChannel-Besitzer"</li>
+			<li>Layoutanpassungen Eingabemaske Bewertungen</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>18.02.2025: </b> V2.18
+		<ul style="margin-top: 0px">
+			<li>Konfiguration um "Anzeige Details" erweitert (Melder, Gemeldeter, Channel)</li>
+			<li>Ansicht "Statistik" optimiert</li>
+		</ul>
+	</div>
+   	<hr>
+	<div>
+		<b>11.02.2025: </b> V2.17
+		<ul style="margin-top: 0px">
+			<li>Layout im Einstellungsdialog korrigiert</li>
+			<li>Layout Auswahldialog "Verwarnung" optimiert</li>
+		</ul>
+	</div>
+    <hr>
+	<div>
+		<b>07.02.2025: </b> V2.16
+		<ul style="margin-top: 0px">
+			<li>Button für Provomacro hinzugefügt mit Auswahl des Provousers.</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>24.01.2025: </b> V2.15
+		<ul style="margin-top: 0px">
+			<li>Anpassung Ermittlung Bearbeitungsquote (Statistik) bei Auswertung für mehrere Mitglieder.</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>09.01.2025: </b> V2.14
+		<ul style="margin-top: 0px">
+			<li>Anpassung gemeldete Inhalte: Profilinhalte von Aussagen optisch getrennt</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>04.01.2025: </b> V2.13
+		<ul style="margin-top: 0px">
+			<li>Macrobutton "Paar" für Paarnicks hinzugefügt.<br><i>Schaltfläche aktiv wenn Registrierung ab 2024</i></li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>27.12.2024: </b> V2.12
+		<ul style="margin-top: 0px">
+			<li>Integration der Free-API von deepl.com zur Übersetzung von gemeldeten Nachrichten.<br><i>Registrierung bei deepl.com und Erstellung eines API-Keys (gratis) notwendig.</i></li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>21.12.2024: </b> V2.11
+		<ul style="margin-top: 0px">
+			<li>
+				Überarbeitung Einstellungsdialog:
+				<ul>
+					<li>Neuer Reiter "Darstellung"</li>
+					<li>Neue Einstellungen für Nickfarbe "Meldende(r)" und "Gemeldete(r)"</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>20.12.2024: </b> v2.10
+		<ul style="margin-top: 0px">
+			<li>Überarbeitung von Darkmode > Eigenes Stylesheet</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>16.12.2024: </b> V2.9
+		<ul style="margin-top: 0px">
+			<li>Box-Layout für alle Inhalte erweitert</li>
+			<li>Profilinhalte von Chatinhalten getrennt</li>
+			<li>Neue Einstellung "Bisherige Meldungen filtern"<br>
+				<i>Aktiviert automatisch die Checkbox das nur Fälle angezeigt werden, in denen der Beschuldigte schuldig war</i>
+			</li>
+		</ul>
+	</div> 
+ 	<hr>
+	<div>
+		<b>15.12.2024: </b> V2.8
+		<ul style="margin-top: 0px">
+			<li>
+				Neue Einstellungen hinzugefügt.
+				<ul>
+					<li>Automatisches Ausklappen Meldeinhalte</li>
+					<li>Aktivierung / Deaktivierung automatische Aktualisierung Übersicht</li>
+					<li>Filtern von Maßnahmen</li>
+				</ul>
+			</li>
+			<li>Korrektur Layout Einstellungsdialog (Darstellungsfehler in EMS-Ansicht)</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>15.12.2024: </b> V2.7
+		<ul style="margin-top: 0px">
+			<li>Einstellungen in Einstellungsdialog (neues Overlay)</li>
+			<li>
+				Pflege von Verwarntexten über Einstellungen hinzugefügt<br>
+				<i>Default Datei für den Import kann <a href="https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Warntexts_default.json">hier</a> gefunden werden.</i>
+			</li>
+			<li>Ausgelagerte Inhalte wieder in Script direkt integriert (Cachingproblem)</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>11.12.2024: </b> V2.5/v2.6
+		<ul style="margin-top: 0px">
+			<li>Aktivierungsschalter "Meldung beantragen" hinzugefügt</li>
+			<li>Auslagerung von bestimmten Funktionen in externes Script</li>
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<b>11.12.2024: </b> V2.4
+		<ul style="margin-top: 0px">
+			<li>Bug bei Auswahl der Meldenummer zum Kopieren gefixt.</li>
+		</ul>
+	</div>	
+	<hr>
+	<div>
+		<b>10.12.2024: </b> V2.3
+		<ul style="margin-top: 0px">
+			<li>Changelog ergänzt - Zum nachhalten der Änderungen für die Nutzer des Scripts.</li>
+		</ul>
+	</div>	
 </div>
