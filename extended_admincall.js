@@ -1695,13 +1695,13 @@ class BaseVariables
                     <span id="paarCommand" class="modern-button copyMacro">Paar</span>
                     <span id="provoCommand" class="modern-button copyMacro" style="display: inline-block;">Provo
                       <div id="provoDropDown" class="dropdown-content">
-                        <a href="#" id="Stas" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Stas</a>
-                        <a href="#" id="Eule" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Eule</a>
-                        <a href="#" id="Jochen" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Jochen</a>
-                        <a href="#" id="Alex" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Alex</a>
-                        <a href="#" id="Cafone" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Cafone</a>
-                        <a href="#" id="Psy" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Psy</a>
-                        <a href="#" id="Dirkson" class="provoCommand" style="border: 1px solid #000; border-radius: 10px;">Dirkson</a>
+                        <a href="#" id="Stas" class="provoCommand">Stas</a>
+                        <a href="#" id="Eule" class="provoCommand">Eule</a>
+                        <a href="#" id="Jochen" class="provoCommand">Jochen</a>
+                        <a href="#" id="Alex" class="provoCommand">Alex</a>
+                        <a href="#" id="Cafone" class="provoCommand">Cafone</a>
+                        <a href="#" id="Psy" class="provoCommand">Psy</a>
+                        <a href="#" id="Dirkson" class="provoCommand">Dirkson</a>
                       </div>
                     </span><br><br>
                    </div>
@@ -2086,16 +2086,19 @@ class BaseVariables
           display: none;
           position: absolute;
           max-width: 130px;
-          background-color: {bgColor};
+          background-color: transparent; //{bgColor};
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           z-index: 1;
           border-radius: 5x;
           > a {
-            padding: 12px 16px;
+            //padding: 12px 16px;
+            padding: 5px;
             text-decoration: none;
             display: block;
             color: white;
             background-color: rgba(175, 142, 232, 1);
+            border: 1px solid #000;
+            border-radius: 5px;
           };
           > a:hover {
             background-color: rgba(175, 142, 232, 0.7);
