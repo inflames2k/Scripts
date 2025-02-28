@@ -1,3 +1,5 @@
+
+
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
@@ -643,8 +645,11 @@ class BaseVariables
        $('#settingsLoadDefault').on("click", function() {
           localStorage.clear();
           baseVariables.settings.load();
+          importWarns('https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Warntexts_default.json?uid' + WarnText.uuidv4(), false);
           applySettings();
           bindWarns();
+
+          alert("Standardeinstellungen wurden erfolgreich geladen.");
        });
 
        window.onclick = function(event) {
@@ -689,7 +694,7 @@ class BaseVariables
         .catch(err => console.log(err));
     }
 
-    function importWarns(uri)
+    function importWarns(uri, doAlert = true)
     {
        fetch(uri)
        .then(res => res.json())
@@ -698,8 +703,8 @@ class BaseVariables
              baseVariables.settings.warnTextCollection.save();
 
              bindWarns();
-
-             alert("Verwarntexte wurden erfolgreich importiert.");
+             if(doAlert)
+              alert("Verwarntexte wurden erfolgreich importiert.");
         })
         .catch(err => console.log(err));
     }
