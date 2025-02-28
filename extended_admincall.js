@@ -1717,6 +1717,7 @@ class BaseVariables
                          <div id="fakeDropDown" class="dropdown-content">
                           <a href="#" id="age" class="fakeCommand">Alter</a>
                           <a href="#" id="gender" class="fakeCommand">Geschlecht</a>
+                          <a href="#" id="u18" class="fakeCommand">u18</a>
                         </div>
                       </span><br><br>
                    </div>
@@ -1756,7 +1757,11 @@ class BaseVariables
         $('.fakeCommand').on("click", function() {
           var id = $(this).attr('id');
 
-          var message = "BS gibt ein abweichendes " + ((id == "age") ? "Alter" : "Geschlecht") + " zu.";
+          var message = "";
+          if(id != "u18")
+            message = "BS gibt ein abweichendes " + ((id == "age") ? "Alter" : "Geschlecht") + " zu";
+          else
+            message = "BS ist nach eigener Angabe jünger als 18";
 
           copyMacroCommand('fakeCommand', message);
           $('#fakeDropDown').hide();
