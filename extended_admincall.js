@@ -1,5 +1,3 @@
-
-
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
@@ -1758,6 +1756,10 @@ class BaseVariables
         $("b:contains('Meldungen bisher:')").parent().next().after('</div>');
         $('#main div:contains("Du bist eingeloggt")').addClass('loginDetail');
 
+        var hintParent = $('div:contains("Momentan ist keine"):last').parent();
+        hintParent.html(hintParent.html() + $('div:contains("Momentan ist keine"):last').text() + "<br><br>");
+        $('div:contains("Momentan ist keine"):last').hide();
+
         if(!$( ".logoutLink" ).length)
             $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><a href="#" id="settings">⚙️ Einstellungen</a> | <a href="#" id="changelog">📋 Changelog</a>');
 
@@ -1851,6 +1853,7 @@ class BaseVariables
       $('span[style*="color: #060"]').addClass("userReporting");
 
       $('div[style*="background:#eee;"],p[style*="background:#ddd"]').addClass("reportHint");
+
       checkPaarCommandVisible();
 
       setReportLinks();
