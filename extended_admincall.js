@@ -1,3 +1,5 @@
+
+
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
@@ -78,7 +80,7 @@ class Settings
    load()
    {
      // setting if report overlay on report overviews should be active
-     this.enableReportOverlay = localStorage.getItem("enableReportOverlay") ?? "ja";
+     this.enableReportOverlay = localStorage.getItem("enableReportOverlay") ?? "nein";
      // setting if "Meldung beantragen" should be shown in main menu
      this.enableReportRequestlink = localStorage.getItem("newReportLink") ?? "aus";
      // setting of the current style (light, Dark)
@@ -90,7 +92,7 @@ class Settings
      // setting if report contents should be expanded by default
      this.expandReportContents = localStorage.getItem("expandReportContents") ?? "nein";
      // setting if report actions should be filtered by report type
-     this.enableActionFilter = localStorage.getItem("enableActionFilter") ?? "ja";
+     this.enableActionFilter = localStorage.getItem("enableActionFilter") ?? "nein";
      // setting if filter "Meldungen ausblenden, in denen die/der Gemeldete nicht schuldig war" should be active by default
      this.enableGuiltyFilter = localStorage.getItem("enableGuiltyFilter") ?? "nein";
      // color for reporting user
@@ -297,6 +299,11 @@ class BaseVariables
                       <h4>Import / Export</h4>
                       <table style="width: 100%">
                         <tr></tr>
+                        <tr>
+                          <td style="width: 0px"></td>
+                          <td style="width: 200px">🛠️ Standard wiederherstellen</td>
+                          <td><input type="button" value="Standard laden" style="width: 114px;" id="settingsLoadDefault" /><br><br></td>
+                        </tr>
                         <tr>
                           <td style="width: 0px"></td>
                           <td style="width: 200px">⬆️ Importiern</td>
@@ -633,6 +640,13 @@ class BaseVariables
 
        $('#warnImportDefault').on("click", function() {
           importWarns('https://raw.githubusercontent.com/inflames2k/Scripts/refs/heads/main/Warntexts_default.json?uid' + WarnText.uuidv4());
+       });
+
+       $('#settingsLoadDefault').on("click", function() {
+          localStorage.clear();
+          baseVariables.settings.load();
+          applySettings();
+          bindWarns();
        });
 
        window.onclick = function(event) {
