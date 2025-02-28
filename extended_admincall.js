@@ -1,5 +1,3 @@
-
-
 // ==UserScript==
 // @name         Extended Admincall
 // @namespace    http://ps.addins.net/
