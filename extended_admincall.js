@@ -304,7 +304,7 @@ class BaseVariables
                         </tr>
                         <tr>
                           <td style="width: 0px"></td>
-                          <td style="width: 200px">⬆️ Importiern</td>
+                          <td style="width: 200px">⬆️ Importieren</td>
                           <td><input type="File" id="settingImport"/><br><br></td>
                         </tr>
                         <tr>
