@@ -1,9 +1,42 @@
 <br><div id="content">
 	<center><h2>Changelog - Extended Admincall Script</h2></center>
+	<div class="memberWrapper" style="margin-bottom: 5px">
+		<b>01.03.2025:</b> V2.20.5
+		<ul>
+			<li>NAGB-Button um Auswahl des NAGB-Grundes erweitert</li>
+			<li>Für Profilbildmeldungen neue Buttns:<br>
+			    <b>n. erkennbar: </b> Auswahl der Verstoßanzahl für nicht erkennbar.<br>
+			    <b>n. selbst: </b> Auswahl der Verstoßanzahl für nicht selbst.
+			</li>
+		</ul>
+	</div>
+	<div class="memberWrapper" style="margin-bottom: 5px">
+		<b>28.02.2025:</b> V2.20.2 / V2.20.3 / V2.20.4
+		<ul>
+			<li>Provo-Button um "Dirkson" erweitert</li>
+			<li>Einstellungen um vollständigen Import / Export erweitert.</li>
+			<li>Button zum Laden der Standardeinstellungen hinzugefügt</li>
+			<li>
+				Verify-Button Fake um Auswahl "Alter" und "Geschlecht" erweitert<br>
+				<i>Neu: Es wird nun auch bei Auswahl Fake das Macro in die Zwischenablage kopiert.</i>
+			</li>
+		</ul>
+	</div>
 	<div class="memberWrapper" style="margin-bottom: 5px">		
 		<b>27.02.2025:</b> V2.20
 		<ul >
-			<li>Neues Macro für Verwarnungen integriert - "/macro warn" statt "/m" mit Verwarnung</li>
+			<li>
+				Neues Macro für Verwarnungen integriert - "/macro warn" statt "/m" mit Verwarnung<br>
+				<b>Macro Definition:</b> /macro warn:Nick|Comment|Message
+				<ul>
+					<li>
+						<b>Comment:</b> "Verstoß" aus Verwarnungseinstellung als - "Verwarnt wg. [Verstoß] *Meldenummer"
+					</li>
+					<li>
+						<b>Message:</b> "Verwarntext" aus Verwarnungseinstellungen
+					</li>
+				</ul>
+			</li>
 			<li>Einstellungsdialog Verwarnungen um Laden der Standard-Verwarntexte erweitert.</li>
 		</ul>
 	</div>
