@@ -1644,9 +1644,11 @@ class BaseVariables
       }
     }
 
+    // function to add warnings to given warning dropdown
     function appendWarningDropdowns(warnings, dropdown, type)
     {
       var links = "";
+      // iterate through warnings and append them to dropdown as link
       for(var i = 0; i < warnings.length; i++)
       {
          links += '<a href="#" name="' + type + '" id="' + warnings[i].title + '" style="width: 100%" class="copyWarn">' + warnings[i].title + '</a>';
@@ -1654,7 +1656,9 @@ class BaseVariables
 
       dropdown.html(links);
 
+      // click function for warning
       $('.copyWarn').on("click", function() {
+        // get warning details
         var id= $(this).attr('id');
         var name = $(this).attr('name');
 
@@ -1675,22 +1679,28 @@ class BaseVariables
             break;
         }
 
+        // build warn macro
         var messageCommand = "/macro warn:" + baseVariables.reportedUser + "|" + tag + " Verwarnt wg. ";
 
+        // get selected warning and set details
         warnArray.forEach((item) => {
           if(item.title == id)
           {
+            // append warn text from warning title and append report ID
             messageCommand = messageCommand + item.title + " " + baseVariables.reportID;
+            // append warntext and replace user-wildcard with user name
             messageCommand += "|" + item.text.replace('{user}', baseVariables.reportedUser);
 
+            // append comment to comment box
             $('textarea[id="comment"]').text(item.comment);
           }
         });
 
+        // if there is a message command
+        // copy macro command to clipboard and set checkboxes
         if(messageCommand)
         {
           navigator.clipboard.writeText(messageCommand);
-          closeModal();
           $('#sanction_reprimand').prop("checked", true);
 
           if(warnArray == baseVariables.settings.warnTextCollection.profilePictureWarns)
@@ -1702,71 +1712,6 @@ class BaseVariables
         dropdown.hide();
         return false;
       })
-    }
-
-    // function to show warning overlay
-    function showWarnings(warnings, type)
-    {
-  /*    $('.reportContent').html('');
-
-      $('.reportContent').append("⚠️ <center><h2>Verwarntexte - " + type + "<h2></center>");
-
-      for(var i = 0; i < warnings.length; i++)
-      {
-        $('.reportContent').append("<details><summary>" + warnings[i].title + "<input class='modern-button copyWarn' id='"+ warnings[i].title + "' name='" + type + "' style='float: right;' type='button' value='Kopieren' /></summary><textarea style='width: 100%; height: 50px;'>" + warnings[i].text.replace('{user}', baseVariables.reportedUser)  + "</textarea></details><br>");
-      }
-
-      $('.modal-content').css('height', '400px');
-      $('.reportcontent').css('height', '350px');
-
-
-      $('.copyWarn').on("click", function() {
-        var id= $(this).attr('id');
-        var name = $(this).attr('name');
-
-        var warnArray;
-        var tag ='';
-
-        switch(name)
-        {
-          case "Allgemein":
-            warnArray = baseVariables.settings.warnTextCollection.commonWarns;
-            break;
-          case "Profilinhalt":
-            warnArray = baseVariables.settings.warnTextCollection.profileContentWarns;
-            break;
-          case "Profilbilder":
-            warnArray = baseVariables.settings.warnTextCollection.profilePictureWarns;
-            tag = 'PROFILE~PROFILE';
-            break;
-        }
-
-        var messageCommand = "/macro warn:" + baseVariables.reportedUser + "|" + tag + " Verwarnt wg. ";
-
-        warnArray.forEach((item) => {
-          if(item.title == id)
-          {
-            messageCommand = messageCommand + item.title + " " + baseVariables.reportID;
-            messageCommand += "|" + item.text.replace('{user}', baseVariables.reportedUser);
-
-            $('textarea[id="comment"]').text(item.comment);
-          }
-        });
-
-        if(messageCommand)
-        {
-          navigator.clipboard.writeText(messageCommand);
-          closeModal();
-          $('#sanction_reprimand').prop("checked", true);
-
-          if(warnArray == baseVariables.settings.warnTextCollection.profilePictureWarns)
-            $('#sanction_photomove').prop("checked", true);
-
-          $('select[name="judgement"] option[value="1"]').prop("selected", true);
-        }
-      })
-
-      $('.modal').show(); */
     }
 
     // function to modify the layout
@@ -1866,103 +1811,9 @@ class BaseVariables
           `);
         }
 
+        hideCommandsByReportType();
 
-         hideCommandsByReportType();
-
-         $('.copyMacro:not(#provoCommand):not(#fakeCommand):not(#nagbCommand):not(#recognizable)').on("click", function() {
-            var id = $(this).attr('id');
-            copyMacroCommand(id);
-         });
-
-         $('#nagbCommand').on("click", function() {
-           $('#nagbDropDown').show();
-         });
-
-         $('#self').on("click", function() {
-           $('#selfDropDown').show();
-         });
-
-         $('#recognizable').on("click", function() {
-           $('#recognizableDropDown').show();
-         });
-
-         $('#fakeCommand').on("click", function() {
-           $('#fakeDropDown').show();
-         });
-
-         $('#provoCommand').on("click", function() {
-           $('#provoDropDown').show();
-         });
-
-          // show warning buttons
-          $('#commonTexts').on("click", function() {
-            appendWarningDropdowns(baseVariables.settings.warnTextCollection.commonWarns, $('#warnDropDownCommon'), 'Allgemein');
-            $('#warnDropDownCommon').show();
-          });
-
-          $('#profilePictures').on("click", function() {
-            appendWarningDropdowns(baseVariables.settings.warnTextCollection.profilePictureWarns, $('#warnDropDownProfilePictures'), 'Profilbilder');
-            $('#warnDropDownProfilePictures').show();
-          });
-
-          $('#profileContents').on("click", function() {
-            appendWarningDropdowns(baseVariables.settings.warnTextCollection.profileContentWarns, $('#warnDropDownProfileContents'), 'Profilinhalt');
-            $('#warnDropDownProfileContents').show();
-          });
-
-          $('.self').on("click", function() {
-            var id = $(this).attr('id');
-            var uls = $(this).attr('uls');
-
-            copyMacroCommand('selfCommand', id, uls);
-            $('#selfDropDown').hide();
-
-            return false;
-         });
-
-         $('.recognizable').on("click", function() {
-            var id = $(this).attr('id');
-            var uls = $(this).attr('uls');
-
-            copyMacroCommand('recognizableCommand', id, uls);
-            $('#recognizableDropDown').hide();
-
-            return false;
-         });
-
-         $('.provoCommand').on("click", function() {
-            var id = $(this).attr('id');
-            copyMacroCommand('provoCommand', id);
-            $('#provoDropDown').hide();
-            return false;
-         });
-
-         $('.nagbCommand').on("click", function() {
-           var reason = $(this).attr('id');
-
-           copyMacroCommand('nagbCommand', reason);
-           $('#nagbDropDown').hide();
-           return false;
-         });
-
-        $('.fakeCommand').on("click", function() {
-          var id = $(this).attr('id');
-
-          var message = "";
-          if(id != "u18")
-            message = "BS gibt ein abweichendes " + ((id == "age") ? "Alter" : "Geschlecht") + " zu";
-          else
-            message = "BS ist nach eigener Angabe jünger als 18";
-
-          copyMacroCommand('fakeCommand', message);
-          $('#fakeDropDown').hide();
-          return false;
-        });
-
-        /*$('.warningTexts').on("click", function() {
-          var id= $(this).attr('id');
-          showWarningOverlay(id);
-        })*/
+        appendClickEventsToButtonCommands();
 
         $("b:contains('Meldungen bisher:')").parent().before('<div style="clear: both;">');
         $("b:contains('Meldungen bisher:')").parent().next().after('</div>');
@@ -2070,6 +1921,111 @@ class BaseVariables
 
       setReportLinks();
       addTextFilter();
+    }
+
+    function appendMacroCommands()
+    {
+      $('.copyMacro:not(#provoCommand):not(#fakeCommand):not(#nagbCommand):not(#recognizable)').on("click", function() {
+          var id = $(this).attr('id');
+          copyMacroCommand(id);
+      });
+
+      $('#nagbCommand').on("click", function() {
+          $('#nagbDropDown').show();
+      });
+
+      $('#fakeCommand').on("click", function() {
+          $('#fakeDropDown').show();
+      });
+
+      $('#provoCommand').on("click", function() {
+          $('#provoDropDown').show();
+      });
+
+      $('.provoCommand').on("click", function() {
+         var id = $(this).attr('id');
+         copyMacroCommand('provoCommand', id);
+         $('#provoDropDown').hide();
+         return false;
+      });
+
+      $('.nagbCommand').on("click", function() {
+        var reason = $(this).attr('id');
+
+        copyMacroCommand('nagbCommand', reason);
+        $('#nagbDropDown').hide();
+        return false;
+      });
+
+      $('.fakeCommand').on("click", function() {
+        var id = $(this).attr('id');
+
+        var message = "";
+        if(id != "u18")
+          message = "BS gibt ein abweichendes " + ((id == "age") ? "Alter" : "Geschlecht") + " zu";
+        else
+          message = "BS ist nach eigener Angabe jünger als 18";
+
+        copyMacroCommand('fakeCommand', message);
+        $('#fakeDropDown').hide();
+        return false;
+      });
+    }
+
+    function appendWarningCommands()
+    {
+      $('#commonTexts').on("click", function() {
+        appendWarningDropdowns(baseVariables.settings.warnTextCollection.commonWarns, $('#warnDropDownCommon'), 'Allgemein');
+        $('#warnDropDownCommon').show();
+      });
+
+      $('#profilePictures').on("click", function() {
+        appendWarningDropdowns(baseVariables.settings.warnTextCollection.profilePictureWarns, $('#warnDropDownProfilePictures'), 'Profilbilder');
+        $('#warnDropDownProfilePictures').show();
+      });
+
+      $('#profileContents').on("click", function() {
+        appendWarningDropdowns(baseVariables.settings.warnTextCollection.profileContentWarns, $('#warnDropDownProfileContents'), 'Profilinhalt');
+        $('#warnDropDownProfileContents').show();
+      });
+    }
+
+    function appendProfileAdministrationCommands()
+    {
+      $('#self').on("click", function() {
+         $('#selfDropDown').show();
+      });
+
+      $('#recognizable').on("click", function() {
+         $('#recognizableDropDown').show();
+      });
+
+      $('.self').on("click", function() {
+        var id = $(this).attr('id');
+        var uls = $(this).attr('uls');
+
+        copyMacroCommand('selfCommand', id, uls);
+        $('#selfDropDown').hide();
+
+        return false;
+      });
+
+      $('.recognizable').on("click", function() {
+         var id = $(this).attr('id');
+         var uls = $(this).attr('uls');
+
+         copyMacroCommand('recognizableCommand', id, uls);
+         $('#recognizableDropDown').hide();
+
+         return false;
+      });
+    }
+
+    function appendClickEventsToButtonCommands()
+    {
+        appendMacroCommands();
+        appendWarningCommands();
+        appendProfileAdministrationCommands();
     }
 
     function checkPaarCommandVisible()
@@ -2252,11 +2208,6 @@ class BaseVariables
           buttons.on("click", function() {
             showLinks();
           });
-
-        /*  var buttons = $('input[type="submit"]').on("click", function() {
-            $('textarea[name="comment"]').val($('textarea[name="comment"]').val().replaceAll('_', '\\_').replaceAll('"', '\\"'));
-            return false;
-          }); */
         }
         catch {}
       }
