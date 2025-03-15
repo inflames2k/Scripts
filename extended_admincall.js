@@ -117,7 +117,7 @@ class Settings
        },
        nagbCommand: {
          title: 'NAGB',
-         text: 'Nickname ist _{reason}_ und damit AGB widrig. Daher mittels permanent gesperrt.'
+         text: 'Nickname ist _{reason}_ und damit AGB widrig. Permanent gesperrt.'
        },
        vknCommand: {
          title: 'VKN',
@@ -125,7 +125,7 @@ class Settings
        },
        paarCommand: {
          title: 'Paar',
-         text: 'Da es sich hier augenscheinlich um einen Paarnick handelt. Entsprechend mittels gesperrt.'
+         text: 'Da es sich hier augenscheinlich um einen Paarnick handelt. Entsprechend permanent gesperrt.'
        },
        provoCommand: {
          title: 'Provo',
@@ -133,7 +133,7 @@ class Settings
        },
        srelCommand: {
          title: 'SREL',
-         text: 'Mit _/macro srel_ permanent gesperrt.\r\n\r\n[Begründung]'
+         text: 'Permanent gesperrt.\r\n\r\n[Begründung]'
        },
        ftCommand: {
          title: 'FT',
