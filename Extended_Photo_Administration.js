@@ -142,7 +142,7 @@
             count++;
 
             var imgElement = $(imageElements[i]);
-            var imgUrl = 'https://photo.knuddels.de/' + (getUrlFromLink ? imgElement.parent().attr('href').replace(/l(?!.*l)/, 'vl') : imgElement.attr('src').replace(/l(?!.*l)/, 'vl'));
+            var imgUrl = 'https://photo.knuddels.de/' + (getUrlFromLink ? imgElement.parent().attr('href').replace(/l(?!.*l)/, 'vl') : imgElement.attr('src').replace(/(?<!v)l(?!.*l)/, 'vl'));
             console.log(imgUrl);
 
             // Container für die Anzeige der KI-Wahrscheinlichkeit erstellen
