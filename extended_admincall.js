@@ -191,7 +191,7 @@ class Settings
        },
        kiAGBCommand: {
          title: 'KI (AGB Verstoß)',
-         text: 'Als AGB Verstoß entfernt. [x]. Verstoß\r\n\r\nnBild ist laut Hive zu [Wert]% KI generiert.\r\nUntertitel KI [nicht] vorhanden.'
+         text: 'Als AGB Verstoß entfernt. [x]. Verstoß\r\n\r\nBild ist laut Hive zu [Wert]% KI generiert.\r\nUntertitel KI [nicht] vorhanden.'
        }
      };
 
