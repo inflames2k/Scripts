@@ -1556,8 +1556,6 @@ class BaseVariables
              case "Aussage melden":
                  removeSanctionGroup("MYCHANNEL");
                  removeSanctionGroup("SPIELE");
-                 removeSanctionGroup("PROFIL");
-
                  removeSanction('sanction_commentdelete');
 
                  removeMyChannelActions();
@@ -1581,8 +1579,7 @@ class BaseVariables
              case "Suizid-/Amokankündigung melden":
                  removeSanctionGroup("MYCHANNEL");
                  removeSanctionGroup("SPIELE");
-                 removeSanctionGroup("PROFIL");
-                  removeSanctionGroup("ALLGEMEINES");
+                 removeSanctionGroup("ALLGEMEINES");
 
                  removeSanction('sanction_reprimand');
                  removeSanction('sanction_ban');
@@ -1613,7 +1610,6 @@ class BaseVariables
              case "Profilbilder melden":
                  removeSanctionGroup("MYCHANNEL");
                  removeSanctionGroup("SPIELE");
-                 removeSanctionGroup("ALLGEMEINES");
 
                   removeSanction('sanction_kick');
                   removeSanction('sanction_mute');
@@ -1625,7 +1621,6 @@ class BaseVariables
              case "Profilinhalt oder Nickname melden":
                   removeSanctionGroup("MYCHANNEL");
                   removeSanctionGroup("SPIELE");
-                  removeSanctionGroup("ALLGEMEINES");
 
                   removeSanction('sanction_kick');
                   removeSanction('sanction_mute');
@@ -1638,7 +1633,6 @@ class BaseVariables
              case "Fotokommentar melden":
                   removeSanctionGroup("MYCHANNEL");
                   removeSanctionGroup("SPIELE");
-                  removeSanctionGroup("ALLGEMEINES");
 
                   removeSanction('sanction_mute');
                   removeSanction('sanction_ban');
