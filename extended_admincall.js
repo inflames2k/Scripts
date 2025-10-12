@@ -160,7 +160,7 @@ class Settings
        },
        tyCommand: {
          title: 'TY',
-         text: 'Gemeldete Person ist nach eigener Angabe jünger als 18. Entsprechend als zu jung gesperrt.'
+         text: 'Gemeldete Person ist nach eigener Angabe jünger als 16. Entsprechend als zu jung gesperrt.'
        },
        vslCommand: {
          title: 'VSL',
@@ -175,6 +175,11 @@ class Settings
          title: 'FAKE-Geschlecht',
          text: 'Als Fake gesperrt. BS gibt ein abweichendes Geschlecht zu.',
          macroText: 'Gibt abweichendes Geschlecht zu'
+       },
+       fakeU18Command: {
+         title: 'FAKE-U18',
+         text: 'Als Fake gesperrt. BS gibt zu noch nicht 18 Jahre alt zu sein.',
+         macroText: 'Nach eigener Angabe jünger als 18'
        },
        agbCommand: {
          title: 'AGB Verstoß',
@@ -2005,6 +2010,10 @@ class BaseVariables
                    $('textarea[id="comment"]').text(baseVariables.settings.textTemplates.fakeGenderCommand.text);
                    macroComment = baseVariables.settings.textTemplates.fakeGenderCommand.macroText;
                    break;
+                 case "u18":
+                   $('textarea[id="comment"]').text(baseVariables.settings.textTemplates.fakeU18Command.text);
+                   macroComment = baseVariables.settings.textTemplates.fakeU18Command.macroText;
+                   break;
                }
 
                command = '/macro fake:' + baseVariables.reportedUser + '|' + macroComment + '|' + baseVariables.reportID;
@@ -2291,6 +2300,7 @@ class BaseVariables
                          <div id="fakeDropDown" class="dropdown-content">
                           <a href="#" id="age" class="fakeCommand">Alter</a>
                           <a href="#" id="gender" class="fakeCommand">Geschlecht</a>
+                          <a href="#" id="u18" class="fakeCommand">u18</a>
                         </div>
                       </span><br><br>
                    </div>
@@ -2676,12 +2686,56 @@ class BaseVariables
           });
           userInfo = userInfo.text().trim().split(',');
           var reg = userInfo[2].trim().substring(userInfo[2].trim().indexOf(': ') + 2, 50);
+          var regDate = reg;
           reg = reg.split('.');
           if(reg[2] < 24)
             $('#paarCommand').remove();
+
+          regDate = parseGermanDate(regDate);
+
+          if(regDate >= parseGermanDate("08.10.25"))
+            highLightRegDate();
          }
          catch{}
       }
+    }
+
+    function highLightRegDate()
+    {
+      if(baseVariables.reportType.trim() != "Alter / Geschlecht melden")
+        return;
+
+      console.log("highLightRegDate started");
+
+      // Finde alle divs mit width 460px die "Reg.:" enthalten
+      var count = 0;
+      $('div[style*="width:460px"]').each(function() {
+          var text = $(this).text();
+          if (text.includes('Reg.:')) {
+              count++;
+              console.log("Found Reg div #" + count, text.substring(0, 50));
+
+              // Nur das zweite highlighten
+              if (count % 2 === 0) {
+                  console.log("Highlighting this one");
+                  var html = $(this).html();
+                  var newHtml = html.replace(
+                      /(Reg\.: \d{2}\.\d{2}\.\d{2}, \d{2}:\d{2})/g,
+                      '<span style="background-color: #FFD39B; padding: 2px 4px; border-radius: 3px; font-weight: bold; color: black">$1</span>'
+                  );
+                  $(this).html(newHtml);
+                  return false; // Stoppe
+              }
+          }
+      });
+
+      console.log("Total found: " + count);
+    }
+
+    function parseGermanDate(dateStr) {
+      const [day, month, year] = dateStr.split(".");
+      const fullYear = parseInt(year) < 100 ? 2000 + parseInt(year) : parseInt(year);
+      return new Date(fullYear, parseInt(month) - 1, parseInt(day));
     }
 
     // function to split report contents
