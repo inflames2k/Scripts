@@ -1189,7 +1189,7 @@ class BaseVariables
                 if (html && html.includes('[Zitierte Nachricht')) {
                     $p.html(html.replace(
                         /\s*\/\s*(\[Zitierte Nachricht([^\]]*)\])([^<]*)/g,
-                        '<br><span class="quotedMessage">$1<br>$3</span><br>'
+                        '<br><br><span class="quotedMessage">$1 $3</span><br><br>'
                     ));
                 }
             });
