@@ -3985,40 +3985,40 @@ function translateMessage(messageContainer)
             .markCount { font-size: 11px; opacity: 0.8; min-width: 60px; text-align: center; }
             .markCurrent { outline: 2px solid rgba(175, 142, 232, 1); outline-offset: -2px; }
 
-            .markMapWrapper {
-              display: flex;
-              align-items: stretch;
-              gap: 6px;
-              width: auto !important;
-              margin: 0 !important;
+            .markMapWrapper { position: relative; width: auto !important; margin: 0 !important; }
+            .markMapWrapper > .log { width: auto !important; }
+
+            .log::-webkit-scrollbar { width: 15px; }
+            .log::-webkit-scrollbar-track { background: rgba(128, 128, 128, 0.12); }
+            .log::-webkit-scrollbar-thumb {
+              background: rgba(128, 128, 128, 0.55);
+              border-radius: 8px;
+              border: 4px solid transparent;
+              background-clip: content-box;
             }
 
-            .markMapWrapper > .log { flex: 1 1 auto; min-width: 0; }
-
             .markMap {
-              position: relative;
-              flex: 0 0 10px;
-              width: 10px !important;
-              margin: 15px 0 0 0 !important;
-              border-radius: 5px;
-              background: rgba(128, 128, 128, 0.18);
+              position: absolute;
+              right: 0;
+              width: 15px !important;
+              margin: 0 !important;
+              pointer-events: none;
+              z-index: 1;
             }
 
             .markMapEntry {
               position: absolute;
               left: 1px;
-              right: 1px;
+              width: 10px;
               height: 4px;
               border-radius: 2px;
-              cursor: pointer;
-              opacity: 0.9;
+              opacity: 0.95;
+              margin-top: 30px;
             }
 
-            .markMapEntry:hover { opacity: 1; }
-
             .markMapCurrent {
+              width: 7px;
               height: 6px;
-              opacity: 1;
               box-shadow: 0 0 0 1px rgba(175, 142, 232, 1);
             }
 
@@ -5831,6 +5831,12 @@ function translateMessage(messageContainer)
         var style = window.getComputedStyle(log);
         var padTop = parseFloat(style.paddingTop) || 0;
         var borderTop = parseFloat(style.borderTopWidth) || 0;
+
+        $map.css({
+            top: $(log).position().top + borderTop,
+            height: log.clientHeight
+        });
+
         var content = log.scrollHeight - padTop - (parseFloat(style.paddingBottom) || 0);
         var track = $map.height() || 1;
         var logRect = log.getBoundingClientRect();
