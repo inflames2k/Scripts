@@ -1,0 +1,169 @@
+{
+    "enableReportOverlay": "ja",
+    "enableReportRequestlink": "aus",
+    "currentStyle": "Dark",
+    "enableAutoRefresh": "ja",
+    "overViewRefreshInterval": "60000",
+    "expandReportContents": "nein",
+    "enableActionFilter": "ja",
+    "enableGuiltyFilter": "nein",
+    "colorSelectReporter": "#06bc06",
+    "colorSelectReported": "#c76060",
+    "enableDeeplTranslation": "ja",
+    "enableDeeplTranslationRow": "nein",
+    "deeplAPIKey": "41690b92-96b0-4b84-9a26-e91ed1037f40:fx",
+    "showDetailsInOverview": "ja",
+    "remindReports": [],
+    "textTemplates": {
+        "botCommand": {
+            "title": "Bot",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Es handelt sich hierbei um einen Botnick.\n#"
+        },
+        "scammerCommand": {
+            "title": "Scammer",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Inhalte weisen deutlich auf einen Scammer hin. \n_Loginland:_ [Loginland]\n#"
+        },
+        "nagbCommand": {
+            "title": "NAGB",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Nickname ist _{reason}_ und damit AGB widrig.\n#"
+        },
+        "vknCommand": {
+            "title": "VKN",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Nick wurde rein aus Verkaufsabsichten registriert. [Begründung]\n#"
+        },
+        "paarCommand": {
+            "title": "Paar",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Augenscheinlich ein Paarnick.\n#"
+        },
+        "provoCommand": {
+            "title": "Provo",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ Bekannter Provo-User, der auf der Provoliste steht und hier erneut durch Provokatives / Beleidigendes Verhalten auffällt.\n_User:_ {provouser}\n#"
+        },
+        "srelCommand": {
+            "title": "SREL",
+            "text": "\n_Sanktion:_ Permanent gesperrt.\n_Grund:_ [Begründung]#\n#"
+        },
+        "ftCommand": {
+            "title": "FT",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Fotoadministration:_ Als pornographisch / freizügig entfernt, 7 Tage ULS\n\n_Grund:_ [Bildbeschreibung]#\n#"
+        },
+        "scamCommand": {
+            "title": "Scam",
+            "text": "#\n_Sanktion:_ Permanent gesperrt.\n_Fotoadministration:_ als fakeversuch ausgeblendet\n_Scamfunde:_ [Scamlink]\n#"
+        },
+        "tyCommand": {
+            "title": "TY",
+            "text": "#\n_Sanktion:_ Permanent gesperrt (ty).\n_Grund:_ Gemeldete Person ist nach eigenen Angaben jünger als 18 Jahre.\n#"
+        },
+        "vslCommand": {
+            "title": "VSL",
+            "text": "#\n_Sanktion:_ Permanent gesperrt (VSL).\n_Grund:_ Berechtigte Zweifel an den Angaben.\n\n[Begründung]\n#"
+        },
+        "fakeAgeCommand": {
+            "title": "FAKE-Alter",
+            "text": "#\n_Sanktion:_ Permanent gesperrt (fake).\n_Grund:_ Gibt ein abweichendes Alter zu.\n#",
+            "macroText": "Gibt abweichendes Alter zu"
+        },
+        "fakeGenderCommand": {
+            "title": "FAKE-Geschlecht",
+            "text": "#\n_Sanktion:_ Permanent gesperrt (fake).\n_Grund:_ Gibt ein abweichendes Geschlecht zu.\n#",
+            "macroText": "Gibt abweichendes Geschlecht zu"
+        },
+        "agbCommand": {
+            "title": "AGB Verstoß",
+            "text": "#\n_Fotoadministration:_ Als AGB Verstoß entfernt.\n_Verstoßnummer:_ [Verstoß]\n_ULS:_ [uls]\n\n_Grund:_ [Beschreibung]\n#"
+        },
+        "kiFakeCommand": {
+            "title": "KI (Fakeversuch)",
+            "text": "#\n_Fotoadministration:_ Als Fakeversuch ausgeblendet.\n_Grund:_ Bild ist laut Hive zu [Wert]% KI generiert. Untertitel KI [nicht] vorhanden.\n#"
+        },
+        "kiAGBCommand": {
+            "title": "KI (AGB Verstoß)",
+            "text": "#\n_Fotoadministration:_ Als AGB Verstoß entfernt.\n_Verstoßnummer:_ [Verstoß]\n_ULS:_ [uls]\n\n_Grund:_ Bild ist laut Hive zu [Wert]% KI generiert. Untertitel KI [nicht] vorhanden.\n#"
+        },
+        "recognizableCommand": {
+            "title": "Foto: nicht erkennbar",
+            "text": "#\n_Fotoadministration:_ Als nicht erkennbar ins Album verschoben.\n_Verstoßnummer:_ {count}\n_ULS:_ {uls}\n_Grund:_ Person ist nicht erkennbar.[Beschreibung]\n#"
+        },
+        "selfCommand": {
+            "title": "Foto: nicht selbst",
+            "text": "#\n_Fotoadministration:_ Als nicht selbst ins Album verschoben.\n_Verstoßnummer:_ {count}\n_ULS:_ {uls}\n_Grund:_ [Beschreibung]\n#"
+        }
+    },
+    "warnTextCollection": {
+        "commonWarns": [
+            {
+                "title": "Provokationen / Beleidigungen",
+                "text": "Hallo {user},#du fielst durch Beleidigungen und / oder Provokationen gegenüber anderen Mitgliedern auf. Derartiges Verhalten entspricht nicht dem Knigge und den AGB von Knuddels.#Man sollte Menschen mit Respekt und Toleranz begegnen.#Bitte halte dich in Zukunft an die AGB und den Knigge.",
+                "comment": "BS fällt hier durch Beleidigungen / Provokationen auf. Daher hier verwarnt.",
+                "id": "145ba226-d912-4f23-8625-33682bb57fe7"
+            },
+            {
+                "title": "Fremdseitenwerbung",
+                "text": "Hallo {user},#du fielst durch Werbung für externe Seiten auf. Entsprechend AGB Punkt 6 ist derartige Werbung nicht gestattet.#Bitte halte dich zukünftig an die AGB.",
+                "comment": "BS fällt hier durch Werbung für eine externe Website auf. Daher hier verwarnt.",
+                "id": "7d778a5b-8af2-4f1d-8ff4-9ac71e97bc6a"
+            },
+            {
+                "title": "Sexuelle Belästigung Erwachsener",
+                "text": "Hallo {user},#du fielst durch Belästigung anderer Mitglieder in Form sexueller Anfragen bzw. Aussagen auf. Derartiges Verhalten entspricht nicht dem Knigge und den AGB.#Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.",
+                "comment": "BS fällt hier durch eindeutige sexuelle Belästigung Erwachsener auf. Daher hier verwarnt.",
+                "id": "1ba33e51-99de-41cc-b601-db44853445e0"
+            },
+            {
+                "title": "Messengerwerbung",
+                "text": "Hallo {user},#du fielst durch Werbung für externe Messenger oder andere Kommunikationsplattformen auf. Entsprechend AGB Punkt 5.6 ist derartige Werbung nicht gestattet.#Bitte unterlasse derartiges Verhalten zukünftig und halte dich an die AGB.",
+                "comment": "BS fällt hier durch Werbung für einen Fremdmessenger bzw. eine andere Kommunikationsplattform auf. Daher hier verwarnt.",
+                "id": "652fcfc7-5a68-4cb1-ba24-323095b97e19"
+            },
+            {
+                "title": "dubiose öffentliche sexuelle Anfragen",
+                "text": "Hallo {user},du fielst durch (dubiose) öffentliche sexuelle Anfragen außerhalb von Erotic-Channels auf. In den allermeisten Channels sind derartige Anfragen nicht erwünscht und entsprechen demnach auch nicht den AGB.##Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.",
+                "comment": "BS fällt hier durch (dubiose) öffentliche sexuelle Anfragen auf. Daher hier verwarnt.",
+                "id": "dd60311f-112c-4af4-9b39-6545616b3d48"
+            },
+            {
+                "title": "Rollenspielanfragen (sexuell)",
+                "text": "Hallo {user},du fielst durch öffentliche Rollenspielanfragen mit sexuellem Hintergrund außerhalb von Erotic-Channels auf. In den allermeisten Channels sind derartige Anfragen nicht erwünscht und entsprechen demnach auch nicht den AGB.##Solltest du weiterhin Interesse an sexuellen Themen haben, besuche bitte Erotic-Channels wie _/Erotic_, _/Matratzensport_ oder _/Verbotene Spiele_.",
+                "comment": "BS fällt hier durch öffentliche Rollenspielanfragen mit sexuellem Hintergrund auf. Daher verwarnt.",
+                "id": "abc10105-248c-458c-b7bb-b379ad4e6a05"
+            },
+            {
+                "title": "Fremdsprachennutzung",
+                "text": "Hallo {user},du fielst durch öffentliche Nutzung von Fremdsprachen auf. Gemäß den AGB sind jedoch nur Deutsch und Englisch als Chatsprachen erlaubt.#Bitte nutze in Zukunft eine dieser beiden Sprachen.",
+                "comment": "BS fällt hier durch Nutzung einer Fremdsprache auf. Daher hier verwarnt.",
+                "id": "a6ba19fb-ee58-4a0a-945f-ec35b90a6d32"
+            }
+        ],
+        "profileContentWarns": [
+            {
+                "title": "Messengerwerbung (Readme)",
+                "text": "Hallo {user},#ich habe soeben deine Readme entfernt.#Der öffentliche Verweis auf andere Kommunikations- und Messenger Plattformen, die nicht Teil der Knuddels-Dienste sind, ist nicht gestattet. [AGB Punkt 5.6].#Bitte achte künftig darauf, wenn du wieder eine Readme setzen solltest.#Im Rahmen dessen kann die erneute Nennung anderer Kommunikations- und Messenger Plattformen in der Readme künftig zu Nicksperren führen.#Für Rückfragen stehe ich dir gerne zur Verfügung.##Knuddelige Grüße",
+                "comment": "BS fällt hier durch Werbung für Fremdmessenger im Readme auf. 1. Verstoß daher hier verwarnt und Readme entfernt.",
+                "id": "548e8ce7-5037-4b64-979e-971b61d00937"
+            },
+            {
+                "title": "Messengerwerbung (Profil)",
+                "text": "Hallo {user},#ich habe soeben deine Profil-Tabs gesperrt.#Der öffentliche Verweis auf andere Kommunikations- und Messenger Plattformen, die nicht Teil der Knuddels-Dienste sind, ist nicht gestattet. [AGB Punkt 5.6].#Bitte entferne die entsprechenden Inhalte in deinem Profil und achte künftig darauf, wenn du wieder Profilinhalte setzen solltest.#Im Rahmen dessen kann die erneute Nennung anderer Kommunikations- und Messenger Plattformen im Profil künftig zu Nicksperren führen.#Nach Entfernung der entsprechenden Inhalte aus deinem Profil, kannst du dich zur Freigabe an mich wenden.#Für Rückfragen stehe ich dir gerne zur Verfügung.##Knuddelige Grüße",
+                "comment": "BS fällt durch Messengerwerbung im Profil auf. Profiltabs gesperrt und verwarnt.",
+                "id": "fb5fc277-0927-49dd-b31d-c82d932554a3"
+            }
+        ],
+        "profilePictureWarns": [
+            {
+                "title": "3. Verstoß nicht erkennbar / nicht selbst",
+                "text": "Hallo {user},##du hast leider erneut ein Foto hochgeladen, welches mit unseren °>/h Fotoregeln<° nicht übereinstimmt. Diese Nachricht dient als ausdrücklicher Hinweis. Bitte halte dich künftig an die Fotoregeln und lade nur Bilder hoch, auf denen du gut zu erkennen bzw. selbst abgebildet bist.##Solltest du Probleme damit haben, einschätzen zu können, welches Bild unseren Fotoregeln entspricht, kannst du dich auch gerne jederzeit an ein Mitglied des Profil-Teams wenden. Solltest du einen direkten Ansprechpartner des Teams suchen, kannst du im Chat _/team Profil_ eingeben. Dort findest du Teammitglieder, welche aktuell online sind.##Für Rückfragen stehe ich dir gerne zur Verfügung.#Ich bitte dich, meine Hinweisnachricht entsprechend zu beherzigen, denn das Profilfoto sollte ja schließlich dazu dienen zu erkennen, mit wem man eigentlich spricht.#Liebe Grüße",
+                "comment": "[Bildbeschreibung]\n\nAls nicht [erkennbar/selbst] verschoben.\n3. Verstoß => VW + AI Eintrag",
+                "id": "7a94cde0-2930-41d3-ae48-0806abb93a29"
+            }
+        ],
+        "verifyWarns": [
+            {
+                "title": "Fakenickerstellung",
+                "text": "Hallo {user},#\ndu fielst durch die Erstellung von Fakenicks auf. Dies ist ein Verstoß gegen die AGB.##Knuddels legt Wert auf die Echtheit seiner Mitglieder. Bitte unterlasse es daher in Zukunft derartige Nicks mit falschen Angaben zu erstellen.#Weitere Fakenickerstellungen können zur Sperrung deines Hauptnicks führen.",
+                "comment": "Verwarnt wg. Fakenickerstellung",
+                "id": "d25ab1d6-fea4-4997-86b4-1afeae4ed9c3"
+            }
+        ]
+    }
+}
