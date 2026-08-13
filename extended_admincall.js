@@ -321,6 +321,9 @@ class BaseVariables
             cache: false
         });
 
+       // append script name and script version to copyright footer
+        $('#footer').html($('#footer').html() + " - <a href='#' id='changelog'>" + GM_info.script.name + ' ' + GM_info.script.version + '</a>');
+
         // add report details to overview (reporter, reported user and Channels)
         addReportNames();
 
@@ -334,9 +337,6 @@ class BaseVariables
         modifyNavigation();
         // modify main page layout
         modifyLayout();
-
-        // append script name and script version to copyright footer
-        $('#footer').html($('#footer').html() + " - " + GM_info.script.name + " " + GM_info.script.version);
 
 
 
@@ -1330,22 +1330,29 @@ class BaseVariables
     function modifyNavigation()
     {
         if($('#navi').length) {
-            // remove toplist from main menu
-            $("a:contains('Topliste')").remove();
-            // remove help from main menu
-            $("a:contains('Hilfe')").remove();
-            // remove logout button since it will be moved to another position
-            $("#navi a:contains('Logout')").remove();
 
-            $('#navi').html($('#navi').html().replace(' |    |   ', ' | ').replace(' |  | ', ' | ').replace('Suche</a> | ', 'Suche</a>'));
+            $('#navi').html(`
+              <a href="ac_start.pl">Meine Meldungen</a> | `
+              + `<span id="reportRequest" style="display: none;"><a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a> | </span>` +
 
-            $('#navi a[href*="ac_search.pl"]').after(' | <a href="ac_start.pl?d=knuddels.de&settings=1">Einstellungen</a>');
+              `<a href="ac_judgestatistic.pl">Statistik</a> |
+              <a href="ac_overview.pl">&Uuml;bersicht</a> |
+              <a href="ac_search.pl">Suche</a> |
+              <a href="ac_admintoplist.pl?settings=1">Einstellungen</a>
+            `);
 
-            if(isSettingsPage())
-                $('#navi a[href*="settings=1"]').addClass('activeNavi');
+            $('#navi').css('color', 'white');
 
-            // add link "Meldung beantragen" to main menu
-            $('#navi a[href*="ac_start.pl?d=knuddels.de"]').after('<span id="reportRequest" style="display: none;">| <a href="ac_getcase.pl?d=knuddels.de">Meldung beantragen</a>')
+            if(/ac_overview.pl/.test(window.location.href))
+              $('#navi a[href*="ac_overview.pl"]').addClass('activeNavi');
+            else if(/ac_start.pl/.test(window.location.href))
+              $('#navi a[href*="ac_start.pl"]').addClass('activeNavi');
+            else if(/ac_judgestatistic.pl/.test(window.location.href))
+              $('#navi a[href*="ac_judgestatistic.pl"]').addClass('activeNavi');
+            else if(/ac_search.pl/.test(window.location.href))
+              $('#navi a[href*="ac_search.pl"]').addClass('activeNavi');
+            else if(isSettingsPage())
+              $('#navi a[href*="settings=1"]').addClass('activeNavi');
         }
     }
 
@@ -2696,7 +2703,7 @@ function translateMessage(messageContainer)
         $('div:contains("Momentan ist keine"):last').hide();
 
         if(!$( ".logoutLink" ).length)
-            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a><br><br><a href="#" id="changelog">📋 Changelog</a>');
+            $('.loginDetail').html($('.loginDetail').html()?.replace('<br><br>', '<br>') + '<a href="ac_logout.pl" class="logoutLink">Logout</a>');
 
         $('#changelog').click(function(){ showChangeLog(); return false; });
 
@@ -3665,6 +3672,7 @@ function translateMessage(messageContainer)
             body:has(.settingsPage) #footer { margin-top: 40px; }
 
             #navi a.activeNavi { color: rgb(175, 142, 232); }
+            #navi a { font-size: 17px !important; }
           `;
 
     const styleDark = () => `
