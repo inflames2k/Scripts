@@ -4216,7 +4216,7 @@ function translateMessage(messageContainer)
           .content-type-section p {
             padding: 0;
             margin: 0;
-            max-width: 96% !important;
+            max-width: 95.3% !important;
             padding-left: 2px;
             padding-right: 5px;
           }
