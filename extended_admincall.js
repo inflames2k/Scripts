@@ -5658,8 +5658,6 @@ function translateMessage(messageContainer)
         return ids;
     }
 
-    var PARALLEL_ID_TOLERANCE = 20000;
-
     // Trefferzeilen der Meldungsrecherche einsammeln
     // Spalten: 0 Meldenummer/Priorität/Status-Code | 1 Typ | 2 letzter Bearbeiter + Bewertung | 3 Start + Status
     function collectParallelCases(html, ownIDs, from)
@@ -5685,10 +5683,7 @@ function translateMessage(messageContainer)
 
             // 01.01.70 heißt: noch nicht begonnen ODER in eine andere Meldung
             // zusammengefasst - beides klärt erst die Meldung selbst
-            var unknownStart = !isPlausibleCaseStart(started);
-
-            if(unknownStart && !open)
-                return;
+            var unknownStart = !isPlausibleCaseStart(started);           
 
             if(!unknownStart && started < from)
                 return;
@@ -5905,13 +5900,14 @@ function translateMessage(messageContainer)
     function resolveParallelCases(cases, from, ready)
     {
         var pending = cases.filter(function(entry) { return entry.needsDetail; })
+                           .sort(function(a, b) { return Number(b.id) - Number(a.id); })
                            .slice(0, PARALLEL_DETAIL_LIMIT);
 
         var finish = function() {
-            // was sich nicht datieren ließ, wird nicht angezeigt -
-            // eine falsche Meldung im Panel kostet mehr als eine fehlende
+            // geschlossene bleiben drin - raus fliegt nur, was sich nicht
+            // datieren ließ oder außerhalb des Zeitfensters liegt
             ready(cases.filter(function(entry) {
-                return entry.open && isPlausibleCaseStart(entry.started) && entry.started >= from;
+                return isPlausibleCaseStart(entry.started) && entry.started >= from;
             }));
         };
 
