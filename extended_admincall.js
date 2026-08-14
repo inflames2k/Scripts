@@ -1413,6 +1413,9 @@ class BaseVariables
                if(href)
                {
                    $('.reportContent').load(href + ' #content', function() {
+                       var $root = $(this);
+                       $root.find('[id="content"]').removeAttr('id');
+
                        $('#showInputsLink').hide();
                        $('.modal-content').css("height", "700px");
                        $('.reportcontent').css("height", "650px");
@@ -1423,8 +1426,8 @@ class BaseVariables
 
                        modifyLayout();
                        setCurrentStyle();
-                       modifyLog(true);
-                       initExtensions(true);
+                       modifyLog($root, true);
+                       initExtensions($root, true);
                    });
                }
              }
@@ -1480,17 +1483,17 @@ class BaseVariables
     }
 
     // function to modify logging area
-    function modifyLog(doOverlay = false)
+    function modifyLog($root)
     {
-        // get names of the reporting users
-        var $reportingUsers = $('.userReporting');
+        $root = $root ?? $('#main');
 
+        var $reportingUsers = $root.find('.userReporting');
 
         // split report contents into text messages and profile contents
-        splitReportContents();
+        splitReportContents($root);
 
         // iterate over all report logs to set highlighting for the reporter and the reported user
-        $('.log').each(function (index){
+        $root.find('.log').each(function (index){
             var $logDiv = $(this);
 
             // get name of the reporting user from report content
@@ -1531,7 +1534,7 @@ class BaseVariables
         });
 
       // add features like deepl translation and AI entry filtering to user details
-      $("h3:contains('Gemeldete Inhalte')").each(function(i){
+      $root.find("h3:contains('Gemeldete Inhalte')").each(function(i){
         var $heading = $(this);
         var $logDiv = $heading.nextAll('.log').first();
 
@@ -1658,7 +1661,7 @@ class BaseVariables
         }, 50);
       });
 
-      if(!doOverlay)
+      if(!$root.is('.reportContent'))
         addMarkNavigation();
     }
 
@@ -3202,11 +3205,11 @@ function translateMessage(messageContainer)
 
     // function to split report contents
     // to report messages and profile contents
-    function splitReportContents()
+    function splitReportContents($root)
     {
-      if(/ac_viewcase.pl/.test(window.location.href) || /ac_editcase.pl/.test(window.location.href))
-      {
-        $('.content-type-section').each(function() {
+        $root = $root ?? $('#main');
+
+        $root.find('.content-type-section').each(function() {
           var item = $(this);
 
           $(this).children('p:contains("Profil-"):not(p:contains("Profil-Foto")):not(p:contains("Profil-Team"))').each(function() {
@@ -3223,8 +3226,7 @@ function translateMessage(messageContainer)
         });
 
 
-        $('.content-type-section h4').css("max-width", "98%");
-      }
+        $root.find('.content-type-section h4').css('max-width', '98%');
     }
 
     function ensureReportInfoHeader()
@@ -4054,6 +4056,28 @@ function translateMessage(messageContainer)
             .acPromptMessage { margin-bottom: 4px; }
             .acPromptList { margin: 0; padding-left: 18px; }
             .acPromptList li { margin-bottom: 4px; }
+
+            .reportContent div {
+              width: auto !important;
+              margin-left: 0 !important;
+              margin-right: 0 !important;
+            }
+
+            /* Filterzeile nur im Overlay umbruchfähig machen */
+            .reportContent .filter-controls > div {
+              flex-wrap: wrap;
+              width: auto !important;
+            }
+
+            /* !important im Stylesheet schlägt das inline min-width (550/850px),
+               deshalb braucht es die Markup-Änderung auf .filterGroup nicht */
+            .reportContent .filter-controls > div > div {
+              min-width: 0 !important;
+              flex-wrap: wrap;
+            }
+
+            .filter-controls:has(.markNavRow) { margin-bottom: 2px !important; }
+            .markNavRow { margin: 4px 0 0 0 !important; }
           `;
 
     const styleDark = () => `
@@ -4221,12 +4245,9 @@ function translateMessage(messageContainer)
             padding-right: 5px;
           }
 
-          .configContent .reportContent .content-type-section p {
-            padding: 0;
-            margin: 0;
-            width: 730;
-            padding-left: 2px;
-            padding-right: 5px;
+          .reportContent .content-type-section p {
+            width: auto !important;
+            max-width: 100% !important;
           }
 
           .reportContent .memberWrapper {
@@ -5467,9 +5488,9 @@ function translateMessage(messageContainer)
      * ----------------------------------------------------------------*/
 
     // ergänzt Suche und Kopierfunktion neben den Nicks in den Überschriften
-    function addNickQuickLinks()
+    function addNickQuickLinks($root)
     {
-        $('#content h3 .userReporting, #content h3 .userReported').each(function() {
+        ($root ?? $('#main')).find('h3 .userReporting, h3 .userReported').each(function() {
             var $nick = $(this);
             var nick = $nick.text().trim();
 
@@ -5496,7 +5517,7 @@ function translateMessage(messageContainer)
     // hebt AN/AUS des Kontaktfilters farblich hervor
     function highlightContactFilter()
     {
-        $('#content div').filter(function() {
+        ($root ?? $('#main')).find('div').filter(function() {
             return $(this).text().trim() === 'Kontaktfilter:';
         }).each(function() {
             var $value = $(this).next();
@@ -5683,7 +5704,7 @@ function translateMessage(messageContainer)
 
             // 01.01.70 heißt: noch nicht begonnen ODER in eine andere Meldung
             // zusammengefasst - beides klärt erst die Meldung selbst
-            var unknownStart = !isPlausibleCaseStart(started);           
+            var unknownStart = !isPlausibleCaseStart(started);
 
             if(!unknownStart && started < from)
                 return;
@@ -6085,15 +6106,17 @@ function translateMessage(messageContainer)
      * ----------------------------------------------------------------*/
 
     // readOnly = true  ->  nur Anzeige-Features (für das Meldungs-Overlay)
-    function initExtensions(readOnly)
+    function initExtensions($root, readOnly)
     {
+        $root = $root ?? $('#main');
         var features = [highlightContactFilter, addNickQuickLinks];
 
         if(!readOnly)
-            features = features.concat([initSanctionTools, addCommentAutosave, addSubmitValidation, initParallelCases]);
+            features = features.concat([initSanctionTools, addCommentAutosave,
+                                        addSubmitValidation, initParallelCases]);
 
         features.forEach(function(feature) {
-            try { feature(); }
+            try { feature($root); }
             catch(error) { console.log('Extended Admincall – ' + feature.name + ':', error); }
         });
 
