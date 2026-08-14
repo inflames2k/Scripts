@@ -5522,6 +5522,7 @@ function translateMessage(messageContainer)
 
     // Meldungen ab (Startzeitpunkt dieser Meldung - X Minuten) gelten als parallel
     var PARALLEL_WINDOW_MINUTES = 10;
+    var PARALLEL_DETAIL_LIMIT = 8;
 
     // "13.08.2026, 15:18:41" / "13.08.26, 19:11" -> Date
     function parseAcDateTime(text)
@@ -5533,11 +5534,66 @@ function translateMessage(messageContainer)
 
         var year = parseInt(match[3], 10);
 
-        if(year < 100)
-            year += 2000;
+        // zweistellig: 70-99 sind 19xx. Sonst wird aus dem Unix-Nullpunkt
+        // (01.01.70) das Jahr 2070 und die Meldung rutscht durch jede Zeitgrenze
+        if(match[3].length === 2)
+            year += (year < 70) ? 2000 : 1900;
 
         return new Date(year, parseInt(match[2], 10) - 1, parseInt(match[1], 10),
                         parseInt(match[4], 10), parseInt(match[5], 10), parseInt(match[6] ?? '0', 10));
+    }
+
+  function extractCaseStart(doc, caseID)
+    {
+        var current = null;
+        var fallback = null;
+        var start = null;
+
+        doc.find('div').each(function() {
+            var $div = $(this);
+            var text = $div.text().trim();
+
+            // "Meldung 2/2: (1423726211)" leitet den nächsten Teilblock ein
+            var head = text.match(/^Meldung\s+\d+\s*\/\s*\d+\s*:\s*\((\d+)\)$/);
+
+            if(head)
+            {
+                current = head[1];
+                return;
+            }
+
+            if(!/^Wann(\s*\/\s*Wo)?:$/.test(text))
+                return;
+
+            var value = parseAcDateTime($div.next().text());
+
+            if(!value)
+                return;
+
+            if(!fallback)
+                fallback = value;
+
+            if(current === caseID)
+            {
+                start = value;
+                return false;
+            }
+        });
+
+        return start ?? fallback;
+    }
+
+    // Startzeitpunkt der aktuellen Meldung
+    function getReportStart()
+    {
+        return extractCaseStart($('#content'), null);
+    }
+
+    function isPlausibleCaseStart(date)
+    {
+        return date instanceof Date && !isNaN(date.getTime())
+            && date.getFullYear() >= 2000
+            && date.getTime() <= Date.now() + 86400000;
     }
 
     // Startzeitpunkt der Meldung aus dem Kopfbereich ("Wann:" bzw. "Wann/Wo:")
@@ -5606,7 +5662,7 @@ function translateMessage(messageContainer)
 
     // Trefferzeilen der Meldungsrecherche einsammeln
     // Spalten: 0 Meldenummer/Priorität/Status-Code | 1 Typ | 2 letzter Bearbeiter + Bewertung | 3 Start + Status
-    function collectParallelCases(html, ownIDs, ownReference, from)
+    function collectParallelCases(html, ownIDs, from)
     {
         var cases = [];
         var seen = {};
@@ -5627,15 +5683,14 @@ function translateMessage(messageContainer)
             var stateCode = ($cells.eq(0).find('div[title]').attr('title') ?? '').trim().toUpperCase();
             var open = stateCode !== 'CLOSED';
 
-            // Noch nicht gestartete Meldungen tragen den Unix-Nullpunkt (01.01.70) –
-            // das sind die gerade eingegangenen, die dürfen nicht durch die Zeitgrenze fallen
-            var pending = !started || isNaN(started.getTime()) || started.getFullYear() < 2000;
+            // 01.01.70 heißt: noch nicht begonnen ODER in eine andere Meldung
+            // zusammengefasst - beides klärt erst die Meldung selbst
+            var unknownStart = !isPlausibleCaseStart(started);
 
-            // ohne Startzeit entscheidet die Nähe der Meldenummer
-            if(pending && (!open || Math.abs(Number(idMatch[1]) - ownReference) > PARALLEL_ID_TOLERANCE))
+            if(unknownStart && !open)
                 return;
 
-            if(!pending && started < from)
+            if(!unknownStart && started < from)
                 return;
 
             seen[idMatch[1]] = true;
@@ -5647,8 +5702,7 @@ function translateMessage(messageContainer)
                 id: idMatch[1],
                 label: $link.text().trim() || idMatch[1],
                 started: started,
-                pending: pending,
-                sortKey: pending ? Number.MAX_SAFE_INTEGER : started.getTime(),
+                needsDetail: unknownStart,
                 type: (type === '-' || type === '–') ? '' : type,
                 open: open,
                 state: $cells.eq(3).find('span').last().text().replace(/\s+/g, ' ').trim(),
@@ -5657,9 +5711,14 @@ function translateMessage(messageContainer)
             });
         });
 
-        // offene zuerst, innerhalb dessen chronologisch, ganz frische ans Ende
+        return cases;
+    }
+
+    function sortParallelCases(cases)
+    {
+        // offene zuerst, innerhalb dessen chronologisch
         return cases.sort(function(a, b) {
-            return (b.open - a.open) || (a.sortKey - b.sortKey);
+            return (b.open - a.open) || (a.started - b.started);
         });
     }
 
@@ -5674,15 +5733,18 @@ function translateMessage(messageContainer)
         var items = cases.map(function(entry) {
             var uri = baseVariables.BaseUri + '/ac/ac_viewcase.pl?domain=knuddels.de&id=' + entry.id;
 
-            var time = entry.pending
-                ? 'gerade eingegangen'
-                : entry.started.toLocaleString('de-DE', { day: '2-digit', month: '2-digit',
-                                                          hour: '2-digit', minute: '2-digit' });
+            var time = isPlausibleCaseStart(entry.started)
+                ? entry.started.toLocaleString('de-DE', { day: '2-digit', month: '2-digit',
+                                                          hour: '2-digit', minute: '2-digit' })
+                : 'Startzeit unbekannt';
 
-            // bei offenen ist interessant, wer sie hat – bei geschlossenen, wie sie ausging
+            // bei offenen ist interessant, wer sie hat - bei geschlossenen, wie sie ausging
             var detail = entry.open
                 ? (entry.handler && !/niemandem/i.test(entry.handler) ? 'bei ' + entry.handler : entry.state)
                 : (entry.judgement || entry.state);
+
+            if(entry.mergedInto)
+                detail = (detail ? detail + ' · ' : '') + 'zsgf. in ' + entry.mergedInto;
 
             return '<li class="' + (entry.open ? 'parallelOpen' : 'parallelClosed') + '">'
                  + '<a href="' + uri + '" target="_blank">' + escapeTemplateHtml(entry.label) + '</a>'
@@ -5737,14 +5799,11 @@ function translateMessage(messageContainer)
         var nick = (baseVariables.reportedUser ?? '').trim();
         var ownIDs = getCurrentCaseIDs();
         var start = getReportStart();
-        var ownReference = Math.max.apply(null, Object.keys(ownIDs).map(Number));
 
         if(!nick || !Object.keys(ownIDs).length || !isCaseUnjudged())
             return;
 
-        // Meldungen ohne echte Startzeit (Unix-Nullpunkt) geben kein brauchbares
-        // Fenster her – dann lieber nichts anzeigen als alles
-        if(!start || isNaN(start.getTime()) || start.getFullYear() < 2000)
+        if(!isPlausibleCaseStart(start))
             return;
 
         var from = new Date(start.getTime() - PARALLEL_WINDOW_MINUTES * 60000);
@@ -5755,15 +5814,19 @@ function translateMessage(messageContainer)
             onload: function(res) {
                 if(res.status !== 200)
                 {
-                    console.log('Extended Admincall – Parallelmeldungen: HTTP ' + res.status);
+                    console.log('Extended Admincall - Parallelmeldungen: HTTP ' + res.status);
                     return;
                 }
 
-                try { renderParallelCases(collectParallelCases(res.responseText, ownIDs, ownReference, from)); }
-                catch(error) { console.log('Extended Admincall – Parallelmeldungen:', error); }
+                try
+                {
+                    resolveParallelCases(collectParallelCases(res.responseText, ownIDs, from), from,
+                        function(confirmed) { renderParallelCases(sortParallelCases(confirmed)); });
+                }
+                catch(error) { console.log('Extended Admincall - Parallelmeldungen:', error); }
             },
             onerror: function(error) {
-                console.log('Extended Admincall – Parallelmeldungen:', error);
+                console.log('Extended Admincall - Parallelmeldungen:', error);
             }
         });
     }
@@ -5794,6 +5857,78 @@ function translateMessage(messageContainer)
         }
 
         return found;
+    }
+
+  function resolveParallelCase(entry, done)
+    {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: baseVariables.BaseUri + '/ac/ac_viewcase.pl?domain=knuddels.de&id=' + entry.id,
+            onload: function(res) {
+                if(res.status !== 200)
+                {
+                    done();
+                    return;
+                }
+
+                try
+                {
+                    var doc = $($.parseHTML(res.responseText));
+                    var head = doc.find('h1').first().text();
+
+                    // zusammengefasste Meldungen erben Nummer und Status der Sammelmeldung
+                    if(/\(geschlossen/i.test(head))
+                        entry.open = false;
+
+                    var parent = head.match(/Meldung\s+(\*?[\d.]+)/);
+
+                    if(parent && parent[1].replace(/\D/g, '') !== entry.id)
+                        entry.mergedInto = parent[1];
+
+                    var started = extractCaseStart(doc, entry.id);
+
+                    if(isPlausibleCaseStart(started))
+                        entry.started = started;
+                }
+                catch(error)
+                {
+                    console.log('Extended Admincall - Parallelmeldung ' + entry.id + ':', error);
+                }
+
+                done();
+            },
+            onerror: function() { done(); }
+        });
+    }
+
+    // alle offenen Fälle ohne verwertbare Startzeit nachschlagen
+    function resolveParallelCases(cases, from, ready)
+    {
+        var pending = cases.filter(function(entry) { return entry.needsDetail; })
+                           .slice(0, PARALLEL_DETAIL_LIMIT);
+
+        var finish = function() {
+            // was sich nicht datieren ließ, wird nicht angezeigt -
+            // eine falsche Meldung im Panel kostet mehr als eine fehlende
+            ready(cases.filter(function(entry) {
+                return entry.open && isPlausibleCaseStart(entry.started) && entry.started >= from;
+            }));
+        };
+
+        var open = pending.length;
+
+        if(!open)
+        {
+            finish();
+            return;
+        }
+
+        pending.forEach(function(entry) {
+            resolveParallelCase(entry, function() {
+                if(--open === 0)
+                    finish();
+            });
+        });
     }
 
     function markedLines(logIndex)
