@@ -2602,7 +2602,7 @@ function translateMessage(messageContainer)
                $('select[name="judgeaccusernick1"] option[value="1"]').prop("selected", true);
                $('select[name="judgeculpritnick0"] option[value="1"]').prop("selected", true);
 
-               $('#sanction_photomove').val("checked", true);
+               $('#sanction_photomove').prop("checked", true);
 
                var uls = "";
                if(Number(additional) > 3 && Number(additional) < 6)
