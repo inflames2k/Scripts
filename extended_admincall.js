@@ -15,6 +15,10 @@
 // @grant         GM_getResourceText
 // ==/UserScript==
 
+// Neu in 2.28:
+// 1) Unterstriche in URLS werden beim Absenden automatisch mit einem Backslash versehen.
+// 2) Ermittlung Parallelmeldungen erweitert
+
 // class representing a warntext
 class WarnText
 {
@@ -5608,7 +5612,7 @@ function translateMessage(messageContainer)
      * ----------------------------------------------------------------*/
 
     // hebt AN/AUS des Kontaktfilters farblich hervor
-    function highlightContactFilter()
+    function highlightContactFilter($root)
     {
         ($root ?? $('#main')).find('div').filter(function() {
             return $(this).text().trim() === 'Kontaktfilter:';
